@@ -17,4 +17,3 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./classes/REST"), exports);
 __exportStar(require("./classes/Routes"), exports);
 __exportStar(require("./classes/APITypes"), exports);
-__exportStar(require("./classes/CDN"), exports);

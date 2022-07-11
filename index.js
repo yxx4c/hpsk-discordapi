@@ -26,11 +26,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.APITypes = exports.RouteBases = exports.Routes = exports.RESTError = exports.REST = void 0;
+exports.APITypes = void 0;
 __exportStar(require("./WebSocket"), exports);
-var REST_1 = require("./REST");
-Object.defineProperty(exports, "REST", { enumerable: true, get: function () { return REST_1.REST; } });
-Object.defineProperty(exports, "RESTError", { enumerable: true, get: function () { return REST_1.RESTError; } });
-Object.defineProperty(exports, "Routes", { enumerable: true, get: function () { return REST_1.Routes; } });
-Object.defineProperty(exports, "RouteBases", { enumerable: true, get: function () { return REST_1.RouteBases; } });
+__exportStar(require("./REST"), exports);
 exports.APITypes = __importStar(require("./REST/classes/APITypes"));
