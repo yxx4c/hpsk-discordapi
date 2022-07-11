@@ -13,7 +13,7 @@ export enum AutoModerationTriggerTypes {
     KeywordPreset=4
 }
 
-export enum AutoModeratonKeywordPresetTypes {
+export enum AutoModerationKeywordPresetTypes {
     Profanity=1,
     SexualContent=2,
     Slurs=3

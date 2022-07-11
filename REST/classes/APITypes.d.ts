@@ -11,7 +11,7 @@ export declare enum AutoModerationTriggerTypes {
     Spam = 3,
     KeywordPreset = 4
 }
-export declare enum AutoModeratonKeywordPresetTypes {
+export declare enum AutoModerationKeywordPresetTypes {
     Profanity = 1,
     SexualContent = 2,
     Slurs = 3

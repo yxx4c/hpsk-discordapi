@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InputVoiceType = exports.PermissionsBitField = exports.VoiceOpcodes = exports.ActivityFlags = exports.ActivityTypes = exports.WebhookTypes = exports.UserVisibilityTypes = exports.PremiumTypes = exports.UserFlags = exports.StickerFormatTypes = exports.StickerTypes = exports.InviteTargetTypes = exports.GuildScheduledEventStatus = exports.GuildScheduledEventEntityTypes = exports.GuildScheduledEventPrivacyLevel = exports.IntegrationExpireBehaviors = exports.SystemChannelFlags = exports.GuildPremiumTier = exports.GuildNSFWLevel = exports.VerificationLevel = exports.MFALevel = exports.ExplicitContentFilterLevel = exports.DefaultNotificationLevel = exports.MessageFlags = exports.MessageActivityTypes = exports.MessageTypes = exports.ChannelFlags = exports.VideoQualityTypes = exports.ChannelTypes = exports.ComponentTypes = exports.AppCommandOptionTypes = exports.InteractionTypes = exports.InteractionCallbackTypes = exports.ApplicationFlags = exports.AuditLogEvents = exports.ApplicationInteractionTypes = exports.AutoModerationActionTypes = exports.AutoModerationEventTypes = exports.AutoModeratonKeywordPresetTypes = exports.AutoModerationTriggerTypes = exports.ButtonStyle = void 0;
+exports.InputVoiceType = exports.PermissionsBitField = exports.VoiceOpcodes = exports.ActivityFlags = exports.ActivityTypes = exports.WebhookTypes = exports.UserVisibilityTypes = exports.PremiumTypes = exports.UserFlags = exports.StickerFormatTypes = exports.StickerTypes = exports.InviteTargetTypes = exports.GuildScheduledEventStatus = exports.GuildScheduledEventEntityTypes = exports.GuildScheduledEventPrivacyLevel = exports.IntegrationExpireBehaviors = exports.SystemChannelFlags = exports.GuildPremiumTier = exports.GuildNSFWLevel = exports.VerificationLevel = exports.MFALevel = exports.ExplicitContentFilterLevel = exports.DefaultNotificationLevel = exports.MessageFlags = exports.MessageActivityTypes = exports.MessageTypes = exports.ChannelFlags = exports.VideoQualityTypes = exports.ChannelTypes = exports.ComponentTypes = exports.AppCommandOptionTypes = exports.InteractionTypes = exports.InteractionCallbackTypes = exports.ApplicationFlags = exports.AuditLogEvents = exports.ApplicationInteractionTypes = exports.AutoModerationActionTypes = exports.AutoModerationEventTypes = exports.AutoModerationKeywordPresetTypes = exports.AutoModerationTriggerTypes = exports.ButtonStyle = void 0;
 var ButtonStyle;
 (function (ButtonStyle) {
     ButtonStyle[ButtonStyle["Primary"] = 1] = "Primary";
@@ -16,12 +16,12 @@ var AutoModerationTriggerTypes;
     AutoModerationTriggerTypes[AutoModerationTriggerTypes["Spam"] = 3] = "Spam";
     AutoModerationTriggerTypes[AutoModerationTriggerTypes["KeywordPreset"] = 4] = "KeywordPreset";
 })(AutoModerationTriggerTypes = exports.AutoModerationTriggerTypes || (exports.AutoModerationTriggerTypes = {}));
-var AutoModeratonKeywordPresetTypes;
-(function (AutoModeratonKeywordPresetTypes) {
-    AutoModeratonKeywordPresetTypes[AutoModeratonKeywordPresetTypes["Profanity"] = 1] = "Profanity";
-    AutoModeratonKeywordPresetTypes[AutoModeratonKeywordPresetTypes["SexualContent"] = 2] = "SexualContent";
-    AutoModeratonKeywordPresetTypes[AutoModeratonKeywordPresetTypes["Slurs"] = 3] = "Slurs";
-})(AutoModeratonKeywordPresetTypes = exports.AutoModeratonKeywordPresetTypes || (exports.AutoModeratonKeywordPresetTypes = {}));
+var AutoModerationKeywordPresetTypes;
+(function (AutoModerationKeywordPresetTypes) {
+    AutoModerationKeywordPresetTypes[AutoModerationKeywordPresetTypes["Profanity"] = 1] = "Profanity";
+    AutoModerationKeywordPresetTypes[AutoModerationKeywordPresetTypes["SexualContent"] = 2] = "SexualContent";
+    AutoModerationKeywordPresetTypes[AutoModerationKeywordPresetTypes["Slurs"] = 3] = "Slurs";
+})(AutoModerationKeywordPresetTypes = exports.AutoModerationKeywordPresetTypes || (exports.AutoModerationKeywordPresetTypes = {}));
 var AutoModerationEventTypes;
 (function (AutoModerationEventTypes) {
     AutoModerationEventTypes[AutoModerationEventTypes["MessageSend"] = 1] = "MessageSend";
