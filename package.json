@@ -1,0 +1,31 @@
+{
+  "name": "hpsk-discordapi",
+  "version": "1.1.0",
+  "description": "",
+  "scripts": {
+    "dev": "tsc.cmd -w"
+  },
+  "keywords": [
+    "discord",
+    "discord-api",
+    "javascript",
+    "js",
+    "raw"
+  ],
+  "author": "gdhpsk <gdhpsk@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^17.0.18",
+    "@types/node-fetch": "^2.6.2",
+    "@types/ws": "^8.5.3",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "form-data-encoder": "^1.7.2",
+    "formdata-node": "^4.3.3",
+    "node-fetch": "^2.6.7",
+    "undici": "^5.6.0",
+    "ws": "^8.8.0"
+  }
+}
