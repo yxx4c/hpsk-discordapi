@@ -1,12 +1,12 @@
 {
-    "compilerOptions": {
-      "lib": ["es2020"],
-      "module":  "CommonJS",
-      "target": "ESNext",
-      "declaration": true,
-      "types": ["node"],
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-    }
+  "compilerOptions": {
+    "lib": ["es2020"],
+    "module": "CommonJS",
+    "target": "ESNext",
+    "declaration": true,
+    "types": ["node"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
   }
+}
