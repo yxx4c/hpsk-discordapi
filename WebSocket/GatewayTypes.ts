@@ -111,5 +111,6 @@ export interface Events {
     "USER_UPDATE": any,
     "VOICE_STATE_UPDATE": any,
     "VOICE_SERVER_UPDATE": any,
-    "WEBHOOKS_UPDATE": any
+    "WEBHOOKS_UPDATE": any,
+    "WEBSOCKET_MESSAGE": any
 }

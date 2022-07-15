@@ -51,7 +51,9 @@ class DiscordWebSocket extends ws_1.WebSocket {
         this.discord_socket.onopen = async () => {
             this.discord_socket.send(JSON.stringify(data));
             this.discord_socket.onclose = async (x) => {
-                this.discord_socket.connect(data);
+                if ([1000, 1006].includes(x.code)) {
+                    this.discord_socket.connect(data);
+                }
             };
             this.discord_socket.onerror = (x) => {
                 console.log(`DiscordWebSocket recieved an error. Message: ${x}`);
@@ -67,6 +69,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     if (err)
                         return console.log(err);
                     data = JSON.parse(buffer.toString("utf8"));
+                    this.eventEmitter.emit("WEBSOCKET_MESSAGE", data);
                 });
             }
             else {
@@ -76,6 +79,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     if (this.gunzipJSON.length) {
                         this.gunzipJSON = "";
                     }
+                    this.eventEmitter.emit("WEBSOCKET_MESSAGE", data);
                 }
                 catch (_) {
                     this.gunzipJSON += data.toString("utf8");
@@ -85,6 +89,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                         if (this.gunzipJSON.length) {
                             this.gunzipJSON = "";
                         }
+                        this.eventEmitter.emit("WEBSOCKET_MESSAGE", data);
                     }
                     catch (_) {
                     }
@@ -125,7 +130,9 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     discord_socket = new DiscordWebSocket({ version: 9, encoding: "json" });
                     discord_socket.once("open", () => {
                         this.discord_socket.onclose = async (x) => {
-                            this.discord_socket.connect(data);
+                            if ([1000, 1006].includes(x.code)) {
+                                this.discord_socket.connect(data);
+                            }
                         };
                         this.discord_socket.onerror = (x) => {
                             console.log(`DiscordWebSocket recieved an error. Message: ${x}`);
