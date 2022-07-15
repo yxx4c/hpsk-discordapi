@@ -3,7 +3,6 @@
       "lib": ["es2020"],
       "module":  "NodeNext",
       "target": "ESNext",
-      "declaration": true,
       "types": ["node"],
       "strict": true,
       "esModuleInterop": true,

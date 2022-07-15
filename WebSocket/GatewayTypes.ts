@@ -29,7 +29,7 @@ interface activities {
 
 interface presence {
     since: number,
-    activities: Array<Record<keyof activities, any>>,
+    activities: Array<Partial<Record<keyof activities, any>>>,
     status: "online" | "dnd" | "idle" | "invisible" | "offline",
     afk: boolean
 }
@@ -114,5 +114,5 @@ export interface Events {
     "VOICE_SERVER_UPDATE": any,
     "WEBHOOKS_UPDATE": any,
     "WEBSOCKET_MESSAGE": any,
-    "SHARD_CREATE": Array<Shard>
+    "SHARD_CREATE": [payload: Shard]
 }
