@@ -51,7 +51,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
         this.discord_socket.onopen = async () => {
             this.discord_socket.send(JSON.stringify(data));
             this.discord_socket.onclose = async (x) => {
-                if ([1000, 1006].includes(x.code)) {
+                if ([1000, 1006, 1001].includes(x.code)) {
                     this.discord_socket.connect(data);
                 }
             };
@@ -130,7 +130,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     discord_socket = new DiscordWebSocket({ version: 9, encoding: "json" });
                     discord_socket.once("open", () => {
                         this.discord_socket.onclose = async (x) => {
-                            if ([1000, 1006].includes(x.code)) {
+                            if ([1000, 1006, 1001].includes(x.code)) {
                                 this.discord_socket.connect(data);
                             }
                         };
