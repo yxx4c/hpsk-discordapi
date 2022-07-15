@@ -117,4 +117,5 @@ export interface Events {
     "SHARD_CREATE": [payload: Shard],
     "SHARD_CREATED": [payload: Shard],
     "SHARD_ERROR": [payload: ShardError]
+    "OFFLINE": [payload: Shard]
 }

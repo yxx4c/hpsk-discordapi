@@ -60,7 +60,11 @@ class DiscordWebSocket extends ws_1.WebSocket {
             });
         });
         this.discord_socket.onclose = (x) => {
-            if ([1000, 1006, 1001].includes(x.code)) {
+            this.eventEmitter.emit("OFFLINE", {
+                id: data.shard?.[0] || 0,
+                totalShards: data.shard?.[1] || 1
+            });
+            if ([1000, 1001].includes(x.code)) {
                 this.discord_socket.connect(data);
             }
             else {

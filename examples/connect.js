@@ -28,4 +28,7 @@ shards.eventEmitter.on("SHARD_ERROR", payload => {
 shards.eventEmitter.on("SHARD_CREATE", async (payload) => {
     console.log(`[WS => Shard ${payload.id}] starting...`);
 });
+shards.eventEmitter.on("OFFLINE", async (payload) => {
+    console.log(`[WS => All Shards (${payload.totalShards})] offline`);
+});
 shards.createShards();

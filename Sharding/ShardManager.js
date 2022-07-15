@@ -4,6 +4,7 @@ exports.DiscordShards = void 0;
 const index_1 = require("../index");
 class DiscordShards extends index_1.DiscordWebSocket {
     rest;
+    gatewayBot;
     gatewayVersion;
     gatewayEncoding;
     data;
@@ -16,13 +17,13 @@ class DiscordShards extends index_1.DiscordWebSocket {
         this.rest = new index_1.REST({}).setToken(data.d.token);
     }
     async createShards() {
-        let gatewayBot = await this.rest.get(index_1.Routes.gatewayBot());
-        for (let i = 0; i < gatewayBot.shards; i++) {
-            let rate_limit_key = i % gatewayBot.session_start_limit.max_concurrency;
+        this.gatewayBot = await this.rest.get(index_1.Routes.gatewayBot());
+        for (let i = 0; i < this.gatewayBot.shards; i++) {
+            let rate_limit_key = i % this.gatewayBot.session_start_limit.max_concurrency;
             let discord_socket = new index_1.DiscordWebSocket({ version: this.gatewayVersion, encoding: this.gatewayEncoding });
             await discord_socket.connect(this.data);
             this.arrayOfSockets.push(discord_socket);
-            if (rate_limit_key == 0 && i != gatewayBot.shards - 1) {
+            if (rate_limit_key == 0 && i != this.gatewayBot.shards - 1) {
                 let queueShard = new Promise((resolve, reject) => {
                     setTimeout(() => {
                         resolve("");
@@ -31,6 +32,9 @@ class DiscordShards extends index_1.DiscordWebSocket {
                 await queueShard;
             }
         }
+        this.eventEmitter.on("OFFLINE", () => {
+            this.createShards();
+        });
     }
 }
 exports.DiscordShards = DiscordShards;
