@@ -26,7 +26,7 @@ class DiscordShards extends index_1.DiscordWebSocket {
                 totalShards: gatewayBot.shards
             });
             this.arrayOfSockets.push(discord_socket);
-            if (rate_limit_key == 0) {
+            if (rate_limit_key == 0 && i != gatewayBot.shards - 1) {
                 let queueShard = new Promise((resolve, reject) => {
                     setTimeout(() => {
                         resolve("");

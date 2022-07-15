@@ -1,7 +1,6 @@
-require("dotenv").config()
+require("dotenv").config({path: "../.env"})
 WebSocket = require("ws")
 const {DiscordShards, GatewayConnection } = require("..")
-
 let data = new GatewayConnection({
     token: process.env.discord_token,
     intents: 3276799,
