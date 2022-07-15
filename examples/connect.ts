@@ -21,7 +21,7 @@ let data = new GatewayConnection({
 let shards = new DiscordShards(data, 9, "json")
 
 shards.eventEmitter.on("SHARD_CREATED", payload => {
-    console.log(`[WS => Shard ${payload.id}] created!${payload.id+1 == payload.totalShards ? " All shards have been activated." : ""}`)
+    console.log(`[WS => Shard ${payload.id}] created!`)
 })
 
 shards.eventEmitter.on("SHARD_ERROR", payload => {
@@ -33,6 +33,6 @@ shards.eventEmitter.on("SHARD_CREATE", async payload  => {
 })
 
 shards.eventEmitter.on("OFFLINE", async payload => {
-    console.log(`[WS => All Shards (${payload.totalShards})] offline`)
+    console.log(`[WS => Shard ${payload.id}] offline`)
 })
 shards.createShards()

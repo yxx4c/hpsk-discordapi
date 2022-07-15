@@ -155,9 +155,23 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     discord_socket.close(1011);
                     discord_socket = new DiscordWebSocket({ version: 9, encoding: "json" });
                     discord_socket.once("open", () => {
-                        this.discord_socket.onclose = async (x) => {
-                            if ([1000, 1006, 1001].includes(x.code)) {
+                        this.discord_socket.onclose = (x) => {
+                            this.eventEmitter.emit("OFFLINE", {
+                                id: data.shard?.[0] || 0,
+                                totalShards: data.shard?.[1] || 1
+                            });
+                            if ([1000, 1001].includes(x.code)) {
                                 this.discord_socket.connect(data);
+                            }
+                            else {
+                                if (x.code.toString().startsWith("40")) {
+                                    this.eventEmitter.emit("SHARD_ERROR", {
+                                        id: data.shard?.[0] || 0,
+                                        totalShards: data.shard?.[1] || 1,
+                                        code: x.code,
+                                        reason: x.reason
+                                    });
+                                }
                             }
                         };
                         this.discord_socket.onerror = (x) => {
