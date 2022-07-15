@@ -59,7 +59,7 @@ class REST extends stream_1.EventEmitter {
         if (obj.authPrefix) {
             this.authPrefix = obj.authPrefix;
         }
-        this.route = `${Routes_1.RouteBases.api}/v${obj.version}`;
+        this.route = `${Routes_1.RouteBases.api}/v${obj.version ?? "10"}`;
         this.cdn = Routes_1.RouteBases.cdn;
     }
     setToken(token) {

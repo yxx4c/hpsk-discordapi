@@ -32,10 +32,11 @@ class DiscordEventEmitter extends node_events_1.EventEmitter {
     off = this.off;
     removeAllListeners = this.removeAllListeners;
 }
+let events = new DiscordEventEmitter();
 class DiscordWebSocket extends ws_1.WebSocket {
-    eventEmitter = new DiscordEventEmitter();
+    eventEmitter = events;
     version;
-    gunzip = node_zlib_1.default.createInflate();
+    gunzip = node_zlib_1.default.createInflate({ finishFlush: node_zlib_1.default.constants.Z_SYNC_FLUSH });
     interval = 0;
     sessionid = "";
     gunzipJSON = "";
@@ -79,6 +80,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     if (this.gunzipJSON.length) {
                         this.gunzipJSON = "";
                     }
+                    // console.log(data)
                     this.eventEmitter.emit("WEBSOCKET_MESSAGE", data);
                 }
                 catch (_) {

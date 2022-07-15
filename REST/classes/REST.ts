@@ -101,7 +101,7 @@ export class REST extends EventEmitter  {
     if(obj.authPrefix) {
         this.authPrefix = obj.authPrefix
     }
-    this.route = `${RouteBases.api}/v${obj.version}`
+    this.route = `${RouteBases.api}/v${obj.version ?? "10"}`
     this.cdn = RouteBases.cdn
   }
 

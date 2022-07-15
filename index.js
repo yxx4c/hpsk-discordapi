@@ -30,3 +30,4 @@ exports.APITypes = void 0;
 __exportStar(require("./WebSocket"), exports);
 __exportStar(require("./REST"), exports);
 exports.APITypes = __importStar(require("./REST/classes/APITypes"));
+__exportStar(require("./Sharding/ShardManager"), exports);

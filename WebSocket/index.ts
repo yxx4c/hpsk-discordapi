@@ -3,7 +3,7 @@ import {EventEmitter} from "node:events"
 import {Events, GatewayOpcodes} from "./GatewayTypes"
 import zlib from "node:zlib"
 
-interface WebSocketOptions {
+export interface WebSocketOptions {
     version: Number,
     encoding: "json" | "etf"
 }
@@ -14,7 +14,6 @@ interface VoiceOptions {
     "selfDeaf": boolean,
     group: string
 }
-
 class DiscordEventEmitter extends  EventEmitter {
     constructor() {
         super()
@@ -25,10 +24,11 @@ class DiscordEventEmitter extends  EventEmitter {
     off: (<K extends keyof Events>(event: K, listener: (...args: Events[K]) => void) => this) & (<S extends string | symbol>(event: Exclude<S, keyof Events>, listener: (...args: any[]) => void) => this) = this.off
     removeAllListeners: (<K extends keyof Events>(event?: K) => this) & (<S extends string | symbol>(event?: Exclude<S, keyof Events>) => this) = this.removeAllListeners
   }
+  let events: DiscordEventEmitter = new DiscordEventEmitter()
 export class DiscordWebSocket extends WebSocket {
-    public eventEmitter: DiscordEventEmitter = new DiscordEventEmitter()
+    public eventEmitter: DiscordEventEmitter = events
     version: Number;
-    private gunzip: zlib.Inflate  = zlib.createInflate();
+    private gunzip: zlib.Inflate  = zlib.createInflate({finishFlush: zlib.constants.Z_SYNC_FLUSH});
     private interval: number = 0;
     private sessionid: string = ""
     private gunzipJSON: string = "";
@@ -72,6 +72,7 @@ export class DiscordWebSocket extends WebSocket {
          if(this.gunzipJSON.length) {
           this.gunzipJSON = ""
         }
+       // console.log(data)
         this.eventEmitter.emit("WEBSOCKET_MESSAGE", data)
         } catch(_) {
           this.gunzipJSON += data.toString("utf8")

@@ -1,3 +1,4 @@
+import { Shard } from "../Sharding/ShardManager"
 
 
 export enum GatewayOpcodes {
@@ -33,7 +34,7 @@ interface presence {
     afk: boolean
 }
 
-interface GatewayConnectionTypes {
+export interface GatewayConnectionTypes {
     token: String,
     properties: properties,
     compress?: boolean,
@@ -112,5 +113,6 @@ export interface Events {
     "VOICE_STATE_UPDATE": any,
     "VOICE_SERVER_UPDATE": any,
     "WEBHOOKS_UPDATE": any,
-    "WEBSOCKET_MESSAGE": any
+    "WEBSOCKET_MESSAGE": any,
+    "SHARD_CREATE": Array<Shard>
 }

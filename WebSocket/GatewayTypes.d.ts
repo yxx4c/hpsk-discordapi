@@ -1,3 +1,4 @@
+import { Shard } from "../Sharding/ShardManager";
 export declare enum GatewayOpcodes {
     Dispatch = 0,
     Heartbeat = 1,
@@ -27,7 +28,7 @@ interface presence {
     status: "online" | "dnd" | "idle" | "invisible" | "offline";
     afk: boolean;
 }
-interface GatewayConnectionTypes {
+export interface GatewayConnectionTypes {
     token: String;
     properties: properties;
     compress?: boolean;
@@ -100,5 +101,6 @@ export interface Events {
     "VOICE_SERVER_UPDATE": any;
     "WEBHOOKS_UPDATE": any;
     "WEBSOCKET_MESSAGE": any;
+    "SHARD_CREATE": Array<Shard>;
 }
 export {};

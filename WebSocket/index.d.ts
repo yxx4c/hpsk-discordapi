@@ -2,7 +2,7 @@
 import { WebSocket } from "ws";
 import { EventEmitter } from "node:events";
 import { Events } from "./GatewayTypes";
-interface WebSocketOptions {
+export interface WebSocketOptions {
     version: Number;
     encoding: "json" | "etf";
 }
