@@ -20,11 +20,7 @@ class DiscordShards extends index_1.DiscordWebSocket {
         for (let i = 0; i < gatewayBot.shards; i++) {
             let rate_limit_key = i % gatewayBot.session_start_limit.max_concurrency;
             let discord_socket = new index_1.DiscordWebSocket({ version: this.gatewayVersion, encoding: this.gatewayEncoding });
-            discord_socket.connect(this.data);
-            this.eventEmitter.emit("SHARD_CREATE", {
-                id: i,
-                totalShards: gatewayBot.shards
-            });
+            await discord_socket.connect(this.data);
             this.arrayOfSockets.push(discord_socket);
             if (rate_limit_key == 0 && i != gatewayBot.shards - 1) {
                 let queueShard = new Promise((resolve, reject) => {

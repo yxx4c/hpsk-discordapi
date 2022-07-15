@@ -1,4 +1,4 @@
-import { Shard } from "../Sharding/ShardManager"
+import { Shard, ShardError } from "../Sharding/Types"
 
 
 export enum GatewayOpcodes {
@@ -114,5 +114,7 @@ export interface Events {
     "VOICE_SERVER_UPDATE": any,
     "WEBHOOKS_UPDATE": any,
     "WEBSOCKET_MESSAGE": any,
-    "SHARD_CREATE": [payload: Shard]
+    "SHARD_CREATE": [payload: Shard],
+    "SHARD_CREATED": [payload: Shard],
+    "SHARD_ERROR": [payload: ShardError]
 }

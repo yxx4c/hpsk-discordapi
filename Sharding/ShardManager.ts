@@ -1,11 +1,6 @@
 import { EventEmitter } from "stream";
 import { DiscordWebSocket, GatewayConnection, GatewayConnectionTypes, REST, Routes } from "../index";
 
-export type Shard = {
-    id: number,
-    totalShards: number
-}
-
 export class DiscordShards extends DiscordWebSocket {
    private rest: REST;
      public gatewayVersion: number;
@@ -24,11 +19,7 @@ export class DiscordShards extends DiscordWebSocket {
         for(let i = 0; i < gatewayBot.shards; i++) {
             let rate_limit_key = i % gatewayBot.session_start_limit.max_concurrency
             let discord_socket = new DiscordWebSocket({version: this.gatewayVersion, encoding: this.gatewayEncoding})
-            discord_socket.connect(this.data as any)
-            this.eventEmitter.emit("SHARD_CREATE", {
-                id: i,
-                totalShards: gatewayBot.shards
-            })
+           await discord_socket.connect(this.data as any)
             this.arrayOfSockets.push(discord_socket)
             if(rate_limit_key == 0 && i != gatewayBot.shards-1) {
                 let queueShard = new Promise((resolve, reject) => {

@@ -47,15 +47,35 @@ class DiscordWebSocket extends ws_1.WebSocket {
         this.version = obj.version ?? 9;
         this.encoding = obj.encoding ?? "json";
     }
-    connect(data) {
+    async connect(data) {
         this.discord_socket = new DiscordWebSocket({ version: this.version, encoding: this.encoding });
+        this.eventEmitter.emit("SHARD_CREATE", {
+            id: data.shard?.[0] || 0,
+            totalShards: data.shard?.[1] || 1
+        });
+        this.eventEmitter.once("READY", () => {
+            this.eventEmitter.emit("SHARD_CREATED", {
+                id: data.shard?.[0] || 0,
+                totalShards: data.shard?.[1] || 1
+            });
+        });
+        this.discord_socket.onclose = (x) => {
+            if ([1000, 1006, 1001].includes(x.code)) {
+                this.discord_socket.connect(data);
+            }
+            else {
+                if (x.code.toString().startsWith("40")) {
+                    this.eventEmitter.emit("SHARD_ERROR", {
+                        id: data.shard?.[0] || 0,
+                        totalShards: data.shard?.[1] || 1,
+                        code: x.code,
+                        reason: x.reason
+                    });
+                }
+            }
+        };
         this.discord_socket.onopen = async () => {
             this.discord_socket.send(JSON.stringify(data));
-            this.discord_socket.onclose = async (x) => {
-                if ([1000, 1006, 1001].includes(x.code)) {
-                    this.discord_socket.connect(data);
-                }
-            };
             this.discord_socket.onerror = (x) => {
                 console.log(`DiscordWebSocket recieved an error. Message: ${x}`);
             };
