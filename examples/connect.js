@@ -4,7 +4,7 @@ require("dotenv").config({ path: "../.env" });
 const __1 = require("../");
 let data = new __1.GatewayConnection({
     token: process.env.discord_token,
-    intents: 4276799,
+    intents: 3276799,
     "presence": {
         "activities": [{
                 "name": "gdhpsks server",

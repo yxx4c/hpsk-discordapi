@@ -4,7 +4,7 @@ import {DiscordShards, GatewayConnection } from "../"
 
 let data = new GatewayConnection({
     token: process.env.discord_token as string,
-    intents: 4276799,
+    intents: 3276799,
     "presence": {
       "activities": [{
         "name": "gdhpsks server",
