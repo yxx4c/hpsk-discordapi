@@ -1,9 +1,10 @@
 import {FormData, request} from "undici"
-import {RouteBases} from "./Routes"
+import {RouteBases, Routes} from "./Routes"
 import {EventEmitter} from "stream" 
 import { Blob } from "buffer"
 import { File } from "formdata-node" 
 import { ResponseData } from "undici/types/dispatcher"
+
 function parseHeader(header: any) {
   if (header === void 0) {
     return header;

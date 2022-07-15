@@ -17,7 +17,12 @@ declare class DiscordEventEmitter extends EventEmitter {
 export declare class DiscordWebSocket extends WebSocket {
     eventEmitter: DiscordEventEmitter;
     version: Number;
+    private gunzip;
+    private interval;
+    private sessionid;
+    private gunzipJSON;
     encoding: "etf" | "json";
+    discord_socket: DiscordWebSocket;
     constructor(obj: WebSocketOptions);
     connect(data: Record<string, string | Object>): void;
 }

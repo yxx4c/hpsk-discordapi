@@ -1,6 +1,7 @@
 import {WebSocket} from "ws"
 import {EventEmitter} from "node:events"
 import {Events, GatewayOpcodes} from "./GatewayTypes"
+import zlib from "node:zlib"
 
 interface WebSocketOptions {
     version: Number,
@@ -24,109 +25,133 @@ class DiscordEventEmitter extends  EventEmitter {
     off: (<K extends keyof Events>(event: K, listener: (...args: Events[K]) => void) => this) & (<S extends string | symbol>(event: Exclude<S, keyof Events>, listener: (...args: any[]) => void) => this) = this.off
     removeAllListeners: (<K extends keyof Events>(event?: K) => this) & (<S extends string | symbol>(event?: Exclude<S, keyof Events>) => this) = this.removeAllListeners
   }
-
-const events: DiscordEventEmitter = new DiscordEventEmitter()
-let discord_socket: any;
-
 export class DiscordWebSocket extends WebSocket {
-    public eventEmitter: DiscordEventEmitter = events
+    public eventEmitter: DiscordEventEmitter = new DiscordEventEmitter()
     version: Number;
+    private gunzip: zlib.Inflate  = zlib.createInflate();
+    private interval: number = 0;
+    private sessionid: string = ""
+    private gunzipJSON: string = "";
     encoding: "etf" | "json";
+    discord_socket!: DiscordWebSocket;
     constructor(obj: WebSocketOptions) {
-        super(`wss://gateway.discord.gg?v=${obj.version}&encoding=${obj.encoding}`);
-        this.version = obj.version
-        this.encoding = obj.encoding
+        super(`wss://gateway.discord.gg?v=${obj.version}&encoding=${obj.encoding}&compress=zlib-stream`);
+        this.version = obj.version ?? 9
+        this.encoding = obj.encoding ?? "json"
     }
-    public connect(data: Record<string, string | Object>): void {
-            discord_socket = new DiscordWebSocket({version: this.version, encoding: this.encoding})
-                discord_socket.onopen = () => {
-                    discord_socket.send(JSON.stringify(data));
-                }
-            let sessionid: String = ""
-            let interval: number= 0
-          discord_socket.onerror = function err(x: any) {
-            console.log(`DiscordWebSocket recieved an error. Message: ${x}`)
+   public connect(data: Record<string, string | Object>): void {
+      this.discord_socket = new DiscordWebSocket({version: this.version, encoding: this.encoding})
+    this.discord_socket.onopen =  async () => {
+      this.discord_socket.send(JSON.stringify(data))
+      this.discord_socket.onclose =  async (x) => {
+        this.discord_socket.connect(data)
+      }
+      this.discord_socket.onerror = (x) => {
+        console.log(`DiscordWebSocket recieved an error. Message: ${x}`)
+      }
+      this.discord_socket.onmessage = (data) => {
+         this.gunzip.write(data.data)
+      }
+
+    }
+   
+    this.gunzip.on("data", data => {
+      let discord_socket = this.discord_socket
+      if(!data.slice(data.length-4).compare(Buffer.from([0x00, 0x00, 0xFF, 0xFF]))) {
+        zlib.unzip(data, (err, buffer) => {
+        if(err) return console.log(err)
+        data = JSON.parse(buffer.toString("utf8"))
+       })
+      } else {
+        try {
+         let some = JSON.parse(!this.gunzipJSON.length ? data.toString("utf8") : this.gunzipJSON)
+         data = some
+         if(this.gunzipJSON.length) {
+          this.gunzipJSON = ""
+        }
+        } catch(_) {
+          this.gunzipJSON += data.toString("utf8")
+          try {
+            let some = JSON.parse(!this.gunzipJSON.length ? Buffer.from(data).toString("utf8") : this.gunzipJSON)
+            data = some
+            if(this.gunzipJSON.length) {
+              this.gunzipJSON = ""
+            }
+          } catch(_) {
+
           }
-          discord_socket.addEventListener("message", async function incoming(data: any) {
-            var x = data.data;
-            let payload = JSON.parse(x as string)
-            let { t, op, d, s } = payload;
-            if (d?.heartbeat_interval) {
-              interval = d.heartbeat_interval
-            }
-            if (d?.session_id) {
-              sessionid = d.session_id
-            }
-            switch (op) {
-              case 9:
-          
-                if (d == true) {
-                    discord_socket.send(JSON.stringify({
-                    op: 6,
-                    d: {
-                      token: process.env.discord_token,
-                      session_id: sessionid,
-                      seq: s
-                    }
-                  }))
-                } else {
-                  setTimeout(() => { }, 3000)
-                  discord_socket.send(JSON.stringify({
-                    op: 2,
-                    d: {
-                      token: process.env.discord_token,
-                      intents: 131071,
-                      status: "online",
-                      "presence": {
-                        "activities": [{
-                          "name": "gdhpsks server",
-                          "type": 2
-                        }]
-                      },
-                      "properties": {
-                        "$os": "windows",
-                        "$browser": "my_library",
-                        "$device": "my_library"
-                      }
-                    }
-                  }))
-                }
-                break;
-              case 1:
+        }
+      }
+        let { t, op, d, s } = data;
+        if (d?.heartbeat_interval) {
+          this.interval = d.heartbeat_interval
+        }
+        if (d?.session_id) {
+          this.sessionid = d.session_id
+        }
+        switch (op) {
+          case GatewayOpcodes.InvalidSession:
+      
+            if (d == true) {
                 discord_socket.send(JSON.stringify({
-                  op: 1,
-                  d: s
-                }))
-                break;
-              case 7:
-                discord_socket.close(1011)
-                discord_socket = new DiscordWebSocket({version: 9, encoding: "json"})
-                discord_socket.once("open", () => {
-                  discord_socket.addEventListener("message", incoming)
-          
-                  discord_socket.send(JSON.stringify({
-                    op: 6,
-                    d: {
-                      token: process.env.discord_token,
-                      session_id: sessionid,
-                      seq: s
-                    }
-                  }))
-                })
-          
-                break;
-              case 10:
-                setInterval(() => {
-                  discord_socket.send(JSON.stringify({
-                    "op": 1,
-                    "d": s
-                  }));
-                }, interval);
-          
-                break;
+                op: GatewayOpcodes.Resume,
+                d: {
+                  token: data.d.token,
+                  session_id: this.sessionid,
+                  seq: s
+                }
+              }))
+            } else {
+              setTimeout(() => { }, 3000)
+              discord_socket.send(data)
             }
-            events.emit(t, d)
-          });
+            break;
+          case GatewayOpcodes.Heartbeat:
+            discord_socket.send(JSON.stringify({
+              op: GatewayOpcodes.Heartbeat,
+              d: s
+            }))
+            break;
+          case GatewayOpcodes.Reconnect:
+            discord_socket.close(1011)
+            discord_socket = new DiscordWebSocket({version: 9, encoding: "json"})
+            discord_socket.once("open", () => {
+              this.discord_socket.onclose =  async (x) => {
+                this.discord_socket.connect(data)
+              }
+              this.discord_socket.onerror = (x) => {
+                console.log(`DiscordWebSocket recieved an error. Message: ${x}`)
+              }
+              this.discord_socket.onmessage = (data) => {
+                 this.gunzip.write(data.data)
+              }
+              discord_socket.send(JSON.stringify({
+                op: GatewayOpcodes.Resume,
+                d: {
+                  token: data.d.token,
+                  session_id: this.sessionid,
+                  seq: s
+                }
+              }))
+            })
+      
+            break;
+          case GatewayOpcodes.Hello:
+            discord_socket.send(JSON.stringify({
+              "op": GatewayOpcodes.Heartbeat,
+              "d": s
+            }));
+            setInterval(() => {
+              discord_socket.send(JSON.stringify({
+                "op": GatewayOpcodes.Heartbeat,
+                "d": s
+              }));
+            }, this.interval);
+      
+            break;
+        }
+        this.eventEmitter.emit(t, d)
+  })
         // setTimeout(() => {}, 1 << 30)
     }
 }

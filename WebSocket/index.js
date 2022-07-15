@@ -13,10 +13,15 @@ var __createBinding = (this && this.__createBinding) || (Object.create ? (functi
 var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscordWebSocket = void 0;
 const ws_1 = require("ws");
 const node_events_1 = require("node:events");
+const GatewayTypes_1 = require("./GatewayTypes");
+const node_zlib_1 = __importDefault(require("node:zlib"));
 class DiscordEventEmitter extends node_events_1.EventEmitter {
     constructor() {
         super();
@@ -27,103 +32,131 @@ class DiscordEventEmitter extends node_events_1.EventEmitter {
     off = this.off;
     removeAllListeners = this.removeAllListeners;
 }
-const events = new DiscordEventEmitter();
-let discord_socket;
 class DiscordWebSocket extends ws_1.WebSocket {
-    eventEmitter = events;
+    eventEmitter = new DiscordEventEmitter();
     version;
+    gunzip = node_zlib_1.default.createInflate();
+    interval = 0;
+    sessionid = "";
+    gunzipJSON = "";
     encoding;
+    discord_socket;
     constructor(obj) {
-        super(`wss://gateway.discord.gg?v=${obj.version}&encoding=${obj.encoding}`);
-        this.version = obj.version;
-        this.encoding = obj.encoding;
+        super(`wss://gateway.discord.gg?v=${obj.version}&encoding=${obj.encoding}&compress=zlib-stream`);
+        this.version = obj.version ?? 9;
+        this.encoding = obj.encoding ?? "json";
     }
     connect(data) {
-        discord_socket = new DiscordWebSocket({ version: this.version, encoding: this.encoding });
-        discord_socket.onopen = () => {
-            discord_socket.send(JSON.stringify(data));
+        this.discord_socket = new DiscordWebSocket({ version: this.version, encoding: this.encoding });
+        this.discord_socket.onopen = async () => {
+            this.discord_socket.send(JSON.stringify(data));
+            this.discord_socket.onclose = async (x) => {
+                this.discord_socket.connect(data);
+            };
+            this.discord_socket.onerror = (x) => {
+                console.log(`DiscordWebSocket recieved an error. Message: ${x}`);
+            };
+            this.discord_socket.onmessage = (data) => {
+                this.gunzip.write(data.data);
+            };
         };
-        let sessionid = "";
-        let interval = 0;
-        discord_socket.onerror = function err(x) {
-            console.log(`DiscordWebSocket recieved an error. Message: ${x}`);
-        };
-        discord_socket.addEventListener("message", async function incoming(data) {
-            var x = data.data;
-            let payload = JSON.parse(x);
-            let { t, op, d, s } = payload;
+        this.gunzip.on("data", data => {
+            let discord_socket = this.discord_socket;
+            if (!data.slice(data.length - 4).compare(Buffer.from([0x00, 0x00, 0xFF, 0xFF]))) {
+                node_zlib_1.default.unzip(data, (err, buffer) => {
+                    if (err)
+                        return console.log(err);
+                    data = JSON.parse(buffer.toString("utf8"));
+                });
+            }
+            else {
+                try {
+                    let some = JSON.parse(!this.gunzipJSON.length ? data.toString("utf8") : this.gunzipJSON);
+                    data = some;
+                    if (this.gunzipJSON.length) {
+                        this.gunzipJSON = "";
+                    }
+                }
+                catch (_) {
+                    this.gunzipJSON += data.toString("utf8");
+                    try {
+                        let some = JSON.parse(!this.gunzipJSON.length ? Buffer.from(data).toString("utf8") : this.gunzipJSON);
+                        data = some;
+                        if (this.gunzipJSON.length) {
+                            this.gunzipJSON = "";
+                        }
+                    }
+                    catch (_) {
+                    }
+                }
+            }
+            let { t, op, d, s } = data;
             if (d?.heartbeat_interval) {
-                interval = d.heartbeat_interval;
+                this.interval = d.heartbeat_interval;
             }
             if (d?.session_id) {
-                sessionid = d.session_id;
+                this.sessionid = d.session_id;
             }
             switch (op) {
-                case 9:
+                case GatewayTypes_1.GatewayOpcodes.InvalidSession:
                     if (d == true) {
                         discord_socket.send(JSON.stringify({
-                            op: 6,
+                            op: GatewayTypes_1.GatewayOpcodes.Resume,
                             d: {
-                                token: process.env.discord_token,
-                                session_id: sessionid,
+                                token: data.d.token,
+                                session_id: this.sessionid,
                                 seq: s
                             }
                         }));
                     }
                     else {
                         setTimeout(() => { }, 3000);
-                        discord_socket.send(JSON.stringify({
-                            op: 2,
-                            d: {
-                                token: process.env.discord_token,
-                                intents: 131071,
-                                status: "online",
-                                "presence": {
-                                    "activities": [{
-                                            "name": "gdhpsks server",
-                                            "type": 2
-                                        }]
-                                },
-                                "properties": {
-                                    "$os": "windows",
-                                    "$browser": "my_library",
-                                    "$device": "my_library"
-                                }
-                            }
-                        }));
+                        discord_socket.send(data);
                     }
                     break;
-                case 1:
+                case GatewayTypes_1.GatewayOpcodes.Heartbeat:
                     discord_socket.send(JSON.stringify({
-                        op: 1,
+                        op: GatewayTypes_1.GatewayOpcodes.Heartbeat,
                         d: s
                     }));
                     break;
-                case 7:
+                case GatewayTypes_1.GatewayOpcodes.Reconnect:
                     discord_socket.close(1011);
                     discord_socket = new DiscordWebSocket({ version: 9, encoding: "json" });
                     discord_socket.once("open", () => {
-                        discord_socket.addEventListener("message", incoming);
+                        this.discord_socket.onclose = async (x) => {
+                            this.discord_socket.connect(data);
+                        };
+                        this.discord_socket.onerror = (x) => {
+                            console.log(`DiscordWebSocket recieved an error. Message: ${x}`);
+                        };
+                        this.discord_socket.onmessage = (data) => {
+                            this.gunzip.write(data.data);
+                        };
                         discord_socket.send(JSON.stringify({
-                            op: 6,
+                            op: GatewayTypes_1.GatewayOpcodes.Resume,
                             d: {
-                                token: process.env.discord_token,
-                                session_id: sessionid,
+                                token: data.d.token,
+                                session_id: this.sessionid,
                                 seq: s
                             }
                         }));
                     });
                     break;
-                case 10:
+                case GatewayTypes_1.GatewayOpcodes.Hello:
+                    discord_socket.send(JSON.stringify({
+                        "op": GatewayTypes_1.GatewayOpcodes.Heartbeat,
+                        "d": s
+                    }));
                     setInterval(() => {
                         discord_socket.send(JSON.stringify({
-                            "op": 1,
+                            "op": GatewayTypes_1.GatewayOpcodes.Heartbeat,
                             "d": s
                         }));
-                    }, interval);
+                    }, this.interval);
                     break;
             }
-            events.emit(t, d);
+            this.eventEmitter.emit(t, d);
         });
         // setTimeout(() => {}, 1 << 30)
     }
