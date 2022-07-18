@@ -1,5 +1,5 @@
-import { EventEmitter } from "stream";
 import { DiscordWebSocket, GatewayConnection, GatewayConnectionTypes, REST, Routes, WebSocketOptions } from "../index";
+import { defaults } from "../REST/classes/APITypes";
 
 export class DiscordShards extends DiscordWebSocket {
    private rest: REST;
@@ -9,8 +9,8 @@ export class DiscordShards extends DiscordWebSocket {
      public readonly arrayOfSockets: Array<DiscordWebSocket> = []
     constructor(obj: WebSocketOptions) {
         super({version: obj.version, encoding: obj.encoding, data: obj.data, caches: obj.caches ?? []})
-        this.gatewayVersion = obj.version as number ?? 9
-        this.gatewayEncoding = obj.encoding ?? "json"
+        this.gatewayVersion = obj.version as number ?? defaults.gateway
+        this.gatewayEncoding = obj.encoding ?? defaults.encoding
         this.rest = new REST({}).setToken(obj.data.d.token as any)
     }
    public async createShards() {

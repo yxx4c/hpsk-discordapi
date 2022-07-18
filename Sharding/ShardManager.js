@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscordShards = void 0;
 const index_1 = require("../index");
+const APITypes_1 = require("../REST/classes/APITypes");
 class DiscordShards extends index_1.DiscordWebSocket {
     rest;
     gatewayBot;
@@ -10,8 +11,8 @@ class DiscordShards extends index_1.DiscordWebSocket {
     arrayOfSockets = [];
     constructor(obj) {
         super({ version: obj.version, encoding: obj.encoding, data: obj.data, caches: obj.caches ?? [] });
-        this.gatewayVersion = obj.version ?? 9;
-        this.gatewayEncoding = obj.encoding ?? "json";
+        this.gatewayVersion = obj.version ?? APITypes_1.defaults.gateway;
+        this.gatewayEncoding = obj.encoding ?? APITypes_1.defaults.encoding;
         this.rest = new index_1.REST({}).setToken(obj.data.d.token);
     }
     async createShards() {

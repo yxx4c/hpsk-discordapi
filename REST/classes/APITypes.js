@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InputVoiceType = exports.PermissionsBitField = exports.VoiceOpcodes = exports.ActivityFlags = exports.ActivityTypes = exports.WebhookTypes = exports.UserVisibilityTypes = exports.PremiumTypes = exports.UserFlags = exports.StickerFormatTypes = exports.StickerTypes = exports.InviteTargetTypes = exports.GuildScheduledEventStatus = exports.GuildScheduledEventEntityTypes = exports.GuildScheduledEventPrivacyLevel = exports.IntegrationExpireBehaviors = exports.SystemChannelFlags = exports.GuildPremiumTier = exports.GuildNSFWLevel = exports.VerificationLevel = exports.MFALevel = exports.ExplicitContentFilterLevel = exports.DefaultNotificationLevel = exports.MessageFlags = exports.MessageActivityTypes = exports.MessageTypes = exports.ChannelFlags = exports.VideoQualityTypes = exports.ChannelTypes = exports.ComponentTypes = exports.AppCommandOptionTypes = exports.InteractionTypes = exports.InteractionCallbackTypes = exports.ApplicationFlags = exports.AuditLogEvents = exports.ApplicationInteractionTypes = exports.AutoModerationActionTypes = exports.AutoModerationEventTypes = exports.AutoModerationKeywordPresetTypes = exports.AutoModerationTriggerTypes = exports.ButtonStyle = void 0;
+exports.defaults = exports.InputVoiceType = exports.PermissionsBitField = exports.VoiceOpcodes = exports.ActivityFlags = exports.ActivityTypes = exports.WebhookTypes = exports.UserVisibilityTypes = exports.PremiumTypes = exports.UserFlags = exports.StickerFormatTypes = exports.StickerTypes = exports.InviteTargetTypes = exports.GuildScheduledEventStatus = exports.GuildScheduledEventEntityTypes = exports.GuildScheduledEventPrivacyLevel = exports.IntegrationExpireBehaviors = exports.SystemChannelFlags = exports.GuildPremiumTier = exports.GuildNSFWLevel = exports.VerificationLevel = exports.MFALevel = exports.ExplicitContentFilterLevel = exports.DefaultNotificationLevel = exports.MessageFlags = exports.MessageActivityTypes = exports.MessageTypes = exports.ChannelFlags = exports.VideoQualityTypes = exports.ChannelTypes = exports.ComponentTypes = exports.AppCommandOptionTypes = exports.InteractionTypes = exports.InteractionCallbackTypes = exports.ApplicationFlags = exports.AuditLogEvents = exports.ApplicationInteractionTypes = exports.AutoModerationActionTypes = exports.AutoModerationEventTypes = exports.AutoModerationKeywordPresetTypes = exports.AutoModerationTriggerTypes = exports.ButtonStyle = void 0;
 var ButtonStyle;
 (function (ButtonStyle) {
     ButtonStyle[ButtonStyle["Primary"] = 1] = "Primary";
@@ -453,3 +453,9 @@ var InputVoiceType;
     InputVoiceType[InputVoiceType["VoiceActivity"] = 0] = "VoiceActivity";
     InputVoiceType[InputVoiceType["PushToTalk"] = 1] = "PushToTalk";
 })(InputVoiceType = exports.InputVoiceType || (exports.InputVoiceType = {}));
+var defaults;
+(function (defaults) {
+    defaults[defaults["gateway"] = 9] = "gateway";
+    defaults[defaults["rest"] = 10] = "rest";
+    defaults["encoding"] = "json";
+})(defaults = exports.defaults || (exports.defaults = {}));

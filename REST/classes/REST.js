@@ -5,6 +5,8 @@ const undici_1 = require("undici");
 const Routes_1 = require("./Routes");
 const stream_1 = require("stream");
 const buffer_1 = require("buffer");
+const package_json_1 = require("../../package.json");
+const APITypes_1 = require("./APITypes");
 function parseHeader(header) {
     if (header === void 0) {
         return header;
@@ -59,7 +61,7 @@ class REST extends stream_1.EventEmitter {
         if (obj.authPrefix) {
             this.authPrefix = obj.authPrefix;
         }
-        this.route = `${Routes_1.RouteBases.api}/v${obj.version ?? "10"}`;
+        this.route = `${Routes_1.RouteBases.api}/v${obj.version ?? APITypes_1.defaults.rest}`;
         this.cdn = Routes_1.RouteBases.cdn;
     }
     setToken(token) {
@@ -69,7 +71,7 @@ class REST extends stream_1.EventEmitter {
     async req(route, requestBody = {}, method) {
         if (!requestBody.headers)
             requestBody.headers = {};
-        requestBody.headers["User-agent"] = "DiscordBot (https://discord.js.org, 0.5.0-dev) Node.js v16.15.1",
+        requestBody.headers["User-agent"] = `DiscordBot (https://github.com/gdhpsk/hpsk-discordapi, ${package_json_1.version})`,
             requestBody.headers["content-type"] = requestBody.files?.length ? undefined : "application/json",
             requestBody.headers.authorization = `Bot ${this.token}`;
         requestBody.method = method;

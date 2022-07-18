@@ -4,6 +4,8 @@ import {EventEmitter} from "stream"
 import { Blob } from "buffer"
 import { File } from "formdata-node" 
 import { ResponseData } from "undici/types/dispatcher"
+import {version} from "../../package.json"
+import { defaults } from "./APITypes"
 
 function parseHeader(header: any) {
   if (header === void 0) {
@@ -101,7 +103,7 @@ export class REST extends EventEmitter  {
     if(obj.authPrefix) {
         this.authPrefix = obj.authPrefix
     }
-    this.route = `${RouteBases.api}/v${obj.version ?? "10"}`
+    this.route = `${RouteBases.api}/v${obj.version ?? defaults.rest}`
     this.cdn = RouteBases.cdn
   }
 
@@ -111,7 +113,7 @@ export class REST extends EventEmitter  {
   }
   private async req(route: String, requestBody: Partial<RESTBody> = {}, method: String): Promise<Record<any, any>>  {
     if(!requestBody.headers) requestBody.headers = {}
-    requestBody.headers["User-agent"] = "DiscordBot (https://discord.js.org, 0.5.0-dev) Node.js v16.15.1",
+    requestBody.headers["User-agent"] = `DiscordBot (https://github.com/gdhpsk/hpsk-discordapi, ${version})`,
       requestBody.headers["content-type"] =requestBody.files?.length ? undefined : "application/json",
       requestBody.headers.authorization = `Bot ${this.token}`
     requestBody.method = method

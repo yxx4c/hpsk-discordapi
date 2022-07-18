@@ -3,6 +3,7 @@ import {EventEmitter} from "node:events"
 import {Events, GatewayOpcodes} from "./GatewayTypes"
 import zlib from "node:zlib"
 import { CacheManager, cacheTypes } from "../index"
+import { defaults } from "../REST/classes/APITypes"
 
 export interface WebSocketOptions {
     version?: Number,
@@ -40,10 +41,10 @@ export class DiscordWebSocket extends WebSocket {
     protected data: Record<any, any>
     public cache: CacheManager
     constructor(obj: WebSocketOptions) {
-        super(`wss://gateway.discord.gg?v=${obj.version ?? 9}&encoding=${obj.encoding ?? "json"}&compress=zlib-stream`);
-        this.version = obj.version ?? 9
+        super(`wss://gateway.discord.gg?v=${obj.version ?? defaults.gateway}&encoding=${obj.encoding ?? defaults.encoding}&compress=zlib-stream`);
+        this.version = obj.version ?? defaults.gateway
         this.data = obj.data
-        this.encoding = obj.encoding ?? "json"
+        this.encoding = obj.encoding ?? defaults.encoding
         this.cache = new CacheManager(obj.caches ?? [], obj.data, events)
     }
   public connect(): void {

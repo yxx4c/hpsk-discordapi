@@ -449,3 +449,9 @@ export enum InputVoiceType {
     VoiceActivity=0,
     PushToTalk=1
 }
+
+export enum defaults {
+    gateway=9,
+    rest=10,
+    encoding="json"
+}

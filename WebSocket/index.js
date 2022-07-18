@@ -23,6 +23,7 @@ const node_events_1 = require("node:events");
 const GatewayTypes_1 = require("./GatewayTypes");
 const node_zlib_1 = __importDefault(require("node:zlib"));
 const index_1 = require("../index");
+const APITypes_1 = require("../REST/classes/APITypes");
 class DiscordEventEmitter extends node_events_1.EventEmitter {
     constructor() {
         super();
@@ -47,10 +48,10 @@ class DiscordWebSocket extends ws_1.WebSocket {
     data;
     cache;
     constructor(obj) {
-        super(`wss://gateway.discord.gg?v=${obj.version ?? 9}&encoding=${obj.encoding ?? "json"}&compress=zlib-stream`);
-        this.version = obj.version ?? 9;
+        super(`wss://gateway.discord.gg?v=${obj.version ?? APITypes_1.defaults.gateway}&encoding=${obj.encoding ?? APITypes_1.defaults.encoding}&compress=zlib-stream`);
+        this.version = obj.version ?? APITypes_1.defaults.gateway;
         this.data = obj.data;
-        this.encoding = obj.encoding ?? "json";
+        this.encoding = obj.encoding ?? APITypes_1.defaults.encoding;
         this.cache = new index_1.CacheManager(obj.caches ?? [], obj.data, exports.events);
     }
     connect() {
