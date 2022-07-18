@@ -2,10 +2,13 @@ import {WebSocket} from "ws"
 import {EventEmitter} from "node:events"
 import {Events, GatewayOpcodes} from "./GatewayTypes"
 import zlib from "node:zlib"
+import { CacheManager, cacheTypes } from "../index"
 
 export interface WebSocketOptions {
-    version: Number,
-    encoding: "json" | "etf"
+    version?: Number,
+    encoding?: "json" | "etf",
+    data: Record<any, any>,
+    caches?: cacheTypes[]
 }
 interface VoiceOptions {
     "guildId": string,
@@ -14,7 +17,7 @@ interface VoiceOptions {
     "selfDeaf": boolean,
     group: string
 }
-class DiscordEventEmitter extends  EventEmitter {
+export class DiscordEventEmitter extends  EventEmitter {
     constructor() {
         super()
     }
@@ -24,7 +27,7 @@ class DiscordEventEmitter extends  EventEmitter {
     off: (<K extends keyof Events>(event: K, listener: (...args: Events[K]) => void) => this) & (<S extends string | symbol>(event: Exclude<S, keyof Events>, listener: (...args: any[]) => void) => this) = this.off
     removeAllListeners: (<K extends keyof Events>(event?: K) => this) & (<S extends string | symbol>(event?: Exclude<S, keyof Events>) => this) = this.removeAllListeners
   }
-  let events: DiscordEventEmitter = new DiscordEventEmitter()
+   export let events: DiscordEventEmitter = new DiscordEventEmitter()
 export class DiscordWebSocket extends WebSocket {
     public eventEmitter: DiscordEventEmitter = events
     version: Number;
@@ -34,35 +37,48 @@ export class DiscordWebSocket extends WebSocket {
     private gunzipJSON: string = "";
     encoding: "etf" | "json";
     discord_socket!: DiscordWebSocket;
+    protected data: Record<any, any>
+    public cache: CacheManager
     constructor(obj: WebSocketOptions) {
-        super(`wss://gateway.discord.gg?v=${obj.version}&encoding=${obj.encoding}&compress=zlib-stream`);
+        super(`wss://gateway.discord.gg?v=${obj.version ?? 9}&encoding=${obj.encoding ?? "json"}&compress=zlib-stream`);
         this.version = obj.version ?? 9
+        this.data = obj.data
         this.encoding = obj.encoding ?? "json"
+        this.cache = new CacheManager(obj.caches ?? [], obj.data, events)
     }
-  public async connect(data: Record<any, any>): Promise<void> {
-      this.discord_socket = new DiscordWebSocket({version: this.version, encoding: this.encoding})
+  public connect(): void {
+      this.discord_socket = new DiscordWebSocket({version: this.version, encoding: this.encoding, data: this.data})
+      this.eventEmitter.on("GUILD_ROLE_CREATE", payload => {
+        console.log(payload)
+    })
+    this.eventEmitter.on("GUILD_ROLE_DELETE", payload => {
+      console.log(payload)
+  })
+  this.eventEmitter.on("GUILD_ROLE_UPDATE", payload => {
+    console.log(payload)
+})
       this.eventEmitter.emit("SHARD_CREATE", {
-        id: data.shard?.[0] || 0,
-        totalShards: data.shard?.[1] || 1
+        id: this.data.d.shard?.[0] || 0,
+        totalShards: this.data.d.shard?.[1] || 1
     })
       this.eventEmitter.once("READY", () => {
         this.eventEmitter.emit("SHARD_CREATED", {
-          id: data.shard?.[0] || 0,
-          totalShards: data.shard?.[1] || 1
+          id: this.data.d.shard?.[0] || 0,
+          totalShards: this.data.d.shard?.[1] || 1
         })
       })
       this.discord_socket.onclose =  (x) => {
         this.eventEmitter.emit("OFFLINE", {
-          id: data.shard?.[0] || 0,
-          totalShards: data.shard?.[1] || 1
+          id: this.data.d.shard?.[0] || 0,
+          totalShards: this.data.d.shard?.[1] || 1
         })
         if([1000, 1001].includes(x.code)) {
-          this.discord_socket.connect(data)
+          this.discord_socket.connect()
         } else {
           if(x.code.toString().startsWith("40")) {
             this.eventEmitter.emit("SHARD_ERROR", {
-              id: data.shard?.[0] || 0,
-              totalShards: data.shard?.[1] || 1,
+              id: this.data.d.shard?.[0] || 0,
+              totalShards: this.data.d.shard?.[1] || 1,
               code: x.code,
               reason: x.reason
             })
@@ -71,7 +87,7 @@ export class DiscordWebSocket extends WebSocket {
     }
 
     this.discord_socket.onopen =  async () => {
-      this.discord_socket.send(JSON.stringify(data))
+      this.discord_socket.send(JSON.stringify(this.data))
       this.discord_socket.onerror = (x) => {
         console.log(`DiscordWebSocket recieved an error. Message: ${x}`)
       }
@@ -132,7 +148,7 @@ export class DiscordWebSocket extends WebSocket {
               }))
             } else {
               setTimeout(() => { }, 3000)
-              discord_socket.send(data)
+              discord_socket.send(JSON.stringify(data))
             }
             break;
           case GatewayOpcodes.Heartbeat:
@@ -143,7 +159,7 @@ export class DiscordWebSocket extends WebSocket {
             break;
           case GatewayOpcodes.Reconnect:
             discord_socket.close(1011)
-            discord_socket = new DiscordWebSocket({version: 9, encoding: "json"})
+            discord_socket = new DiscordWebSocket({version: this.version, encoding: this.encoding, data: this.data})
             discord_socket.once("open", () => {
               this.discord_socket.onclose =  (x) => {
                 this.eventEmitter.emit("OFFLINE", {
@@ -151,7 +167,7 @@ export class DiscordWebSocket extends WebSocket {
                   totalShards: data.shard?.[1] || 1
                 })
                 if([1000, 1001].includes(x.code)) {
-                  this.discord_socket.connect(data)
+                  this.discord_socket.connect()
                 } else {
                   if(x.code.toString().startsWith("40")) {
                     this.eventEmitter.emit("SHARD_ERROR", {

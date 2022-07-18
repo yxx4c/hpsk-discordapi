@@ -17,11 +17,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DiscordWebSocket = void 0;
+exports.DiscordWebSocket = exports.events = exports.DiscordEventEmitter = void 0;
 const ws_1 = require("ws");
 const node_events_1 = require("node:events");
 const GatewayTypes_1 = require("./GatewayTypes");
 const node_zlib_1 = __importDefault(require("node:zlib"));
+const index_1 = require("../index");
 class DiscordEventEmitter extends node_events_1.EventEmitter {
     constructor() {
         super();
@@ -32,9 +33,10 @@ class DiscordEventEmitter extends node_events_1.EventEmitter {
     off = this.off;
     removeAllListeners = this.removeAllListeners;
 }
-let events = new DiscordEventEmitter();
+exports.DiscordEventEmitter = DiscordEventEmitter;
+exports.events = new DiscordEventEmitter();
 class DiscordWebSocket extends ws_1.WebSocket {
-    eventEmitter = events;
+    eventEmitter = exports.events;
     version;
     gunzip = node_zlib_1.default.createInflate({ finishFlush: node_zlib_1.default.constants.Z_SYNC_FLUSH });
     interval = 0;
@@ -42,36 +44,49 @@ class DiscordWebSocket extends ws_1.WebSocket {
     gunzipJSON = "";
     encoding;
     discord_socket;
+    data;
+    cache;
     constructor(obj) {
-        super(`wss://gateway.discord.gg?v=${obj.version}&encoding=${obj.encoding}&compress=zlib-stream`);
+        super(`wss://gateway.discord.gg?v=${obj.version ?? 9}&encoding=${obj.encoding ?? "json"}&compress=zlib-stream`);
         this.version = obj.version ?? 9;
+        this.data = obj.data;
         this.encoding = obj.encoding ?? "json";
+        this.cache = new index_1.CacheManager(obj.caches ?? [], obj.data, exports.events);
     }
-    async connect(data) {
-        this.discord_socket = new DiscordWebSocket({ version: this.version, encoding: this.encoding });
+    connect() {
+        this.discord_socket = new DiscordWebSocket({ version: this.version, encoding: this.encoding, data: this.data });
+        this.eventEmitter.on("GUILD_ROLE_CREATE", payload => {
+            console.log(payload);
+        });
+        this.eventEmitter.on("GUILD_ROLE_DELETE", payload => {
+            console.log(payload);
+        });
+        this.eventEmitter.on("GUILD_ROLE_UPDATE", payload => {
+            console.log(payload);
+        });
         this.eventEmitter.emit("SHARD_CREATE", {
-            id: data.shard?.[0] || 0,
-            totalShards: data.shard?.[1] || 1
+            id: this.data.d.shard?.[0] || 0,
+            totalShards: this.data.d.shard?.[1] || 1
         });
         this.eventEmitter.once("READY", () => {
             this.eventEmitter.emit("SHARD_CREATED", {
-                id: data.shard?.[0] || 0,
-                totalShards: data.shard?.[1] || 1
+                id: this.data.d.shard?.[0] || 0,
+                totalShards: this.data.d.shard?.[1] || 1
             });
         });
         this.discord_socket.onclose = (x) => {
             this.eventEmitter.emit("OFFLINE", {
-                id: data.shard?.[0] || 0,
-                totalShards: data.shard?.[1] || 1
+                id: this.data.d.shard?.[0] || 0,
+                totalShards: this.data.d.shard?.[1] || 1
             });
             if ([1000, 1001].includes(x.code)) {
-                this.discord_socket.connect(data);
+                this.discord_socket.connect();
             }
             else {
                 if (x.code.toString().startsWith("40")) {
                     this.eventEmitter.emit("SHARD_ERROR", {
-                        id: data.shard?.[0] || 0,
-                        totalShards: data.shard?.[1] || 1,
+                        id: this.data.d.shard?.[0] || 0,
+                        totalShards: this.data.d.shard?.[1] || 1,
                         code: x.code,
                         reason: x.reason
                     });
@@ -79,7 +94,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
             }
         };
         this.discord_socket.onopen = async () => {
-            this.discord_socket.send(JSON.stringify(data));
+            this.discord_socket.send(JSON.stringify(this.data));
             this.discord_socket.onerror = (x) => {
                 console.log(`DiscordWebSocket recieved an error. Message: ${x}`);
             };
@@ -142,7 +157,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     }
                     else {
                         setTimeout(() => { }, 3000);
-                        discord_socket.send(data);
+                        discord_socket.send(JSON.stringify(data));
                     }
                     break;
                 case GatewayTypes_1.GatewayOpcodes.Heartbeat:
@@ -153,7 +168,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     break;
                 case GatewayTypes_1.GatewayOpcodes.Reconnect:
                     discord_socket.close(1011);
-                    discord_socket = new DiscordWebSocket({ version: 9, encoding: "json" });
+                    discord_socket = new DiscordWebSocket({ version: this.version, encoding: this.encoding, data: this.data });
                     discord_socket.once("open", () => {
                         this.discord_socket.onclose = (x) => {
                             this.eventEmitter.emit("OFFLINE", {
@@ -161,7 +176,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                                 totalShards: data.shard?.[1] || 1
                             });
                             if ([1000, 1001].includes(x.code)) {
-                                this.discord_socket.connect(data);
+                                this.discord_socket.connect();
                             }
                             else {
                                 if (x.code.toString().startsWith("40")) {

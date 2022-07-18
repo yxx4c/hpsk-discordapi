@@ -18,8 +18,8 @@ let data = new __1.GatewayConnection({
         "device": "IPhone 13"
     }
 });
-let shards = new __1.DiscordShards(data, 9, "json");
-shards.eventEmitter.on("SHARD_CREATED", payload => {
+let shards = new __1.DiscordShards({ data: data, version: 9, encoding: "json", caches: ["roles", "channels", "guilds", "users", "emojis"] });
+shards.eventEmitter.on("SHARD_CREATED", async (payload) => {
     console.log(`[WS => Shard ${payload.id}] created!`);
 });
 shards.eventEmitter.on("SHARD_ERROR", payload => {
@@ -31,4 +31,12 @@ shards.eventEmitter.on("SHARD_CREATE", async (payload) => {
 shards.eventEmitter.on("OFFLINE", async (payload) => {
     console.log(`[WS => Shard ${payload.id}] offline`);
 });
-shards.createShards();
+shards.createShards().then(async () => {
+    let wait = new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve("");
+        }, 5000);
+    });
+    await wait;
+    console.log(shards.cache.roles);
+});

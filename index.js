@@ -31,3 +31,5 @@ __exportStar(require("./WebSocket"), exports);
 __exportStar(require("./REST"), exports);
 exports.APITypes = __importStar(require("./REST/classes/APITypes"));
 __exportStar(require("./Sharding/ShardManager"), exports);
+__exportStar(require("./Sharding/Types"), exports);
+__exportStar(require("./Cache/CacheManager"), exports);
