@@ -1,7 +1,7 @@
 {
   "name": "hpsk-discordapi",
   "repository": "git://github.com/gdhpsk/hpsk-discordapi.git",
-  "version": "1.2.6",
+  "version": "2.0.0",
   "description": "",
   "scripts": {
     "dev": "tsc.cmd -w"

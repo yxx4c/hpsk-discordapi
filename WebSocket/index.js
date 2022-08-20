@@ -38,6 +38,7 @@ exports.DiscordEventEmitter = DiscordEventEmitter;
 exports.events = new DiscordEventEmitter();
 class DiscordWebSocket extends ws_1.WebSocket {
     eventEmitter = exports.events;
+    resume_gateway_url;
     version;
     gunzip = node_zlib_1.default.createInflate({ finishFlush: node_zlib_1.default.constants.Z_SYNC_FLUSH });
     interval = 0;
@@ -141,8 +142,11 @@ class DiscordWebSocket extends ws_1.WebSocket {
             if (d?.heartbeat_interval) {
                 this.interval = d.heartbeat_interval;
             }
-            if (d?.session_id) {
-                this.sessionid = d.session_id;
+            switch (t) {
+                case "READY":
+                    this.resume_gateway_url = d.resume_gateway_url;
+                    this.sessionid = d.session_id;
+                    break;
             }
             switch (op) {
                 case GatewayTypes_1.GatewayOpcodes.InvalidSession:
@@ -169,7 +173,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     break;
                 case GatewayTypes_1.GatewayOpcodes.Reconnect:
                     discord_socket.close(1011);
-                    discord_socket = new DiscordWebSocket({ version: this.version, encoding: this.encoding, data: this.data });
+                    discord_socket = new DiscordWebSocket({ version: this.version, encoding: this.encoding, data: this.data, url: this.resume_gateway_url });
                     discord_socket.once("open", () => {
                         this.discord_socket.onclose = (x) => {
                             this.eventEmitter.emit("OFFLINE", {

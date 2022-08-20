@@ -8,6 +8,7 @@ import { defaults } from "../REST/classes/APITypes"
 export interface WebSocketOptions {
     version?: Number,
     encoding?: "json" | "etf",
+    url?: String,
     data: Record<any, any>,
     caches?: cacheTypes[]
 }
@@ -31,6 +32,7 @@ export class DiscordEventEmitter extends  EventEmitter {
    export let events: DiscordEventEmitter = new DiscordEventEmitter()
 export class DiscordWebSocket extends WebSocket {
     public eventEmitter: DiscordEventEmitter = events
+    public resume_gateway_url!: String
     version: Number;
     private gunzip: zlib.Inflate  = zlib.createInflate({finishFlush: zlib.constants.Z_SYNC_FLUSH});
     private interval: number = 0;
@@ -132,8 +134,11 @@ export class DiscordWebSocket extends WebSocket {
         if (d?.heartbeat_interval) {
           this.interval = d.heartbeat_interval
         }
-        if (d?.session_id) {
-          this.sessionid = d.session_id
+        switch(t) {
+          case "READY":
+            this.resume_gateway_url = d.resume_gateway_url
+            this.sessionid = d.session_id
+            break;
         }
         switch (op) {
           case GatewayOpcodes.InvalidSession:
@@ -160,7 +165,7 @@ export class DiscordWebSocket extends WebSocket {
             break;
           case GatewayOpcodes.Reconnect:
             discord_socket.close(1011)
-            discord_socket = new DiscordWebSocket({version: this.version, encoding: this.encoding, data: this.data})
+            discord_socket = new DiscordWebSocket({version: this.version, encoding: this.encoding, data: this.data, url: this.resume_gateway_url})
             discord_socket.once("open", () => {
               this.discord_socket.onclose =  (x) => {
                 this.eventEmitter.emit("OFFLINE", {
