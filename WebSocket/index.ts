@@ -43,7 +43,8 @@ export class DiscordWebSocket extends WebSocket {
     protected data: Record<any, any>
     public cache: CacheManager
     constructor(obj: WebSocketOptions) {
-        super(`wss://gateway.discord.gg?v=${obj.version ?? defaults.gateway}&encoding=${obj.encoding ?? defaults.encoding}&compress=zlib-stream`);
+      let url = obj.url ?? `wss://gateway.discord.gg?v=${obj.version ?? defaults.gateway}&encoding=${obj.encoding ?? defaults.encoding}&compress=zlib-stream`
+        super(url as any);
         this.version = obj.version ?? defaults.gateway
         this.data = obj.data
         this.encoding = obj.encoding ?? defaults.encoding
@@ -136,7 +137,7 @@ export class DiscordWebSocket extends WebSocket {
         }
         switch(t) {
           case "READY":
-            this.resume_gateway_url = d.resume_gateway_url
+            this.resume_gateway_url = d.resume_gateway_url + `?v=${this.version ?? defaults.gateway}&encoding=${this.encoding ?? defaults.encoding}&compress=zlib-stream`
             this.sessionid = d.session_id
             break;
         }
