@@ -58,15 +58,6 @@ class DiscordWebSocket extends ws_1.WebSocket {
     }
     connect() {
         this.discord_socket = new DiscordWebSocket({ version: this.version, encoding: this.encoding, data: this.data });
-        this.eventEmitter.on("GUILD_ROLE_CREATE", payload => {
-            console.log(payload);
-        });
-        this.eventEmitter.on("GUILD_ROLE_DELETE", payload => {
-            console.log(payload);
-        });
-        this.eventEmitter.on("GUILD_ROLE_UPDATE", payload => {
-            console.log(payload);
-        });
         this.eventEmitter.emit("SHARD_CREATE", {
             id: this.data.d.shard?.[0] || 0,
             totalShards: this.data.d.shard?.[1] || 1
