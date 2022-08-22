@@ -56,17 +56,19 @@ export class DiscordWebSocket extends WebSocket {
         id: this.data.d.shard?.[0] || 0,
         totalShards: this.data.d.shard?.[1] || 1
     })
-      this.eventEmitter.once("READY", () => {
+      this.eventEmitter.on("READY", () => {
         this.eventEmitter.emit("SHARD_CREATED", {
           id: this.data.d.shard?.[0] || 0,
           totalShards: this.data.d.shard?.[1] || 1
         })
       })
       this.discord_socket.onclose =  (x) => {
-        this.eventEmitter.emit("OFFLINE", {
-          id: this.data.d.shard?.[0] || 0,
-          totalShards: this.data.d.shard?.[1] || 1
-        })
+        if(x.code != 1011) {
+          this.eventEmitter.emit("OFFLINE", {
+            id: this.data.d.shard?.[0] || 0,
+            totalShards: this.data.d.shard?.[1] || 1
+          })
+      }
         if([1000, 1001].includes(x.code)) {
           this.discord_socket.connect()
         } else {
@@ -160,10 +162,12 @@ export class DiscordWebSocket extends WebSocket {
             discord_socket = new DiscordWebSocket({version: this.version, encoding: this.encoding, data: this.data, url: this.resume_gateway_url})
             discord_socket.once("open", () => {
               this.discord_socket.onclose =  (x) => {
+                if(x.code != 1011) {
                 this.eventEmitter.emit("OFFLINE", {
                   id: data.shard?.[0] || 0,
                   totalShards: data.shard?.[1] || 1
                 })
+              }
                 if([1000, 1001].includes(x.code)) {
                   this.discord_socket.connect()
                 } else {
@@ -177,6 +181,10 @@ export class DiscordWebSocket extends WebSocket {
                   }
                 }
             }
+            this.eventEmitter.emit("SHARD_CREATE", {
+              id: this.data.d.shard?.[0] || 0,
+              totalShards: this.data.d.shard?.[1] || 1
+          })
               this.discord_socket.onerror = (x) => {
                 console.log(`DiscordWebSocket recieved an error. Message: ${x}`)
               }
