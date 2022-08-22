@@ -99,7 +99,6 @@ class DiscordWebSocket extends ws_1.WebSocket {
             };
         };
         this.gunzip.on("data", data => {
-            let discord_socket = this.discord_socket;
             if (!data.slice(data.length - 4).compare(Buffer.from([0x00, 0x00, 0xFF, 0xFF]))) {
                 node_zlib_1.default.unzip(data, (err, buffer) => {
                     if (err)
@@ -145,7 +144,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
             switch (op) {
                 case GatewayTypes_1.GatewayOpcodes.InvalidSession:
                     if (d == true) {
-                        discord_socket.send(JSON.stringify({
+                        this.discord_socket.send(JSON.stringify({
                             op: GatewayTypes_1.GatewayOpcodes.Resume,
                             d: {
                                 token: this.data.d.token,
@@ -156,19 +155,19 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     }
                     else {
                         setTimeout(() => { }, 3000);
-                        discord_socket.send(JSON.stringify(data));
+                        this.discord_socket.send(JSON.stringify(data));
                     }
                     break;
                 case GatewayTypes_1.GatewayOpcodes.Heartbeat:
-                    discord_socket.send(JSON.stringify({
+                    this.discord_socket.send(JSON.stringify({
                         op: GatewayTypes_1.GatewayOpcodes.Heartbeat,
                         d: s
                     }));
                     break;
                 case GatewayTypes_1.GatewayOpcodes.Reconnect:
-                    discord_socket.close(1011);
-                    discord_socket = new DiscordWebSocket({ version: this.version, encoding: this.encoding, data: this.data, url: this.resume_gateway_url });
-                    discord_socket.once("open", () => {
+                    this.discord_socket.close(1011);
+                    this.discord_socket = new DiscordWebSocket({ version: this.version, encoding: this.encoding, data: this.data, url: this.resume_gateway_url });
+                    this.discord_socket.once("open", () => {
                         this.discord_socket.onclose = (x) => {
                             if (x.code != 1011) {
                                 this.eventEmitter.emit("OFFLINE", {
@@ -200,7 +199,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                         this.discord_socket.onmessage = (data) => {
                             this.gunzip.write(data.data);
                         };
-                        discord_socket.send(JSON.stringify({
+                        this.discord_socket.send(JSON.stringify({
                             op: GatewayTypes_1.GatewayOpcodes.Resume,
                             d: {
                                 token: this.data.d.token,
@@ -211,12 +210,12 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     });
                     break;
                 case GatewayTypes_1.GatewayOpcodes.Hello:
-                    discord_socket.send(JSON.stringify({
+                    this.discord_socket.send(JSON.stringify({
                         "op": GatewayTypes_1.GatewayOpcodes.Heartbeat,
                         "d": s
                     }));
                     setInterval(() => {
-                        discord_socket.send(JSON.stringify({
+                        this.discord_socket.send(JSON.stringify({
                             "op": GatewayTypes_1.GatewayOpcodes.Heartbeat,
                             "d": s
                         }));
