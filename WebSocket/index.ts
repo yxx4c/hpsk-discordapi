@@ -139,7 +139,7 @@ export class DiscordWebSocket extends WebSocket {
                 discord_socket.send(JSON.stringify({
                 op: GatewayOpcodes.Resume,
                 d: {
-                  token: data.d.token,
+                  token: this.data.d.token,
                   session_id: this.sessionid,
                   seq: s
                 }
@@ -186,7 +186,7 @@ export class DiscordWebSocket extends WebSocket {
               discord_socket.send(JSON.stringify({
                 op: GatewayOpcodes.Resume,
                 d: {
-                  token: data.d.token,
+                  token: this.data.d.token,
                   session_id: this.sessionid,
                   seq: s
                 }

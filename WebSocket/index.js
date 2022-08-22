@@ -146,7 +146,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                         discord_socket.send(JSON.stringify({
                             op: GatewayTypes_1.GatewayOpcodes.Resume,
                             d: {
-                                token: data.d.token,
+                                token: this.data.d.token,
                                 session_id: this.sessionid,
                                 seq: s
                             }
@@ -195,7 +195,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                         discord_socket.send(JSON.stringify({
                             op: GatewayTypes_1.GatewayOpcodes.Resume,
                             d: {
-                                token: data.d.token,
+                                token: this.data.d.token,
                                 session_id: this.sessionid,
                                 seq: s
                             }
