@@ -94,12 +94,13 @@ export class DiscordWebSocket extends WebSocket {
 
     }
     this.gunzip.on("data", data => {
-      if(!data.slice(data.length-4).compare(Buffer.from([0x00, 0x00, 0xFF, 0xFF]))) {
-        zlib.unzip(data, (err, buffer) => {
-        if(err) return console.log(err)
-        data = JSON.parse(buffer.toString("utf8"))
-        this.eventEmitter.emit("WEBSOCKET_MESSAGE", data)
-       })
+      if(!data.slice(data.length-4).compare(Buffer.from([0x00, 0x00, 0xFF, 0xFF])) || data.length < 4) {
+      //   zlib.unzip(data, (err, buffer) => {
+      //   if(err) return console.log(err)
+      //   data = JSON.parse(buffer.toString("utf8"))
+      //   this.eventEmitter.emit("WEBSOCKET_MESSAGE", data)
+      //  })
+      return
       } else {
         try {
          let some = JSON.parse(!this.gunzipJSON.length ? data.toString("utf8") : this.gunzipJSON)
