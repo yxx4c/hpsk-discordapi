@@ -34,10 +34,10 @@ export class DiscordWebSocket extends WebSocket {
     public eventEmitter: DiscordEventEmitter = events
     public resume_gateway_url!: String
     version: Number;
+    private dataTwo!: Record<any, any>;
     private gunzip: zlib.Inflate  = zlib.createInflate({finishFlush: zlib.constants.Z_SYNC_FLUSH});
     private interval: number = 0;
-    private sessionid: string = ""
-    private gunzipJSON: string = "";
+    private sessionid: string = "";
     encoding: "etf" | "json";
     discord_socket!: DiscordWebSocket;
     protected data: Record<any, any>
@@ -93,38 +93,21 @@ export class DiscordWebSocket extends WebSocket {
       }
 
     }
+    let concat: any[] = []
     this.gunzip.on("data", data => {
-      if(!data.slice(data.length-4).compare(Buffer.from([0x00, 0x00, 0xFF, 0xFF])) || data.length < 4) {
-      //   zlib.unzip(data, (err, buffer) => {
-      //   if(err) return console.log(err)
-      //   data = JSON.parse(buffer.toString("utf8"))
-      //   this.eventEmitter.emit("WEBSOCKET_MESSAGE", data)
-      //  })
+      concat.push(data)
+      if(!data.slice(data.length-4).compare(Buffer.from("0000FFFF", "hex")) || data.length < 4) {
       return
-      } else {
-        try {
-         let some = JSON.parse(!this.gunzipJSON.length ? data.toString("utf8") : this.gunzipJSON)
-         data = some
-         if(this.gunzipJSON.length) {
-          this.gunzipJSON = ""
-        }
-       // console.log(data)
-        this.eventEmitter.emit("WEBSOCKET_MESSAGE", data)
-        } catch(_) {
-          this.gunzipJSON += data.toString("utf8")
-          try {
-            let some = JSON.parse(!this.gunzipJSON.length ? Buffer.from(data).toString("utf8") : this.gunzipJSON)
-            data = some
-            if(this.gunzipJSON.length) {
-              this.gunzipJSON = ""
-            }
-            this.eventEmitter.emit("WEBSOCKET_MESSAGE", data)
-          } catch(_) {
-
-          }
-        }
+    } else { 
+      try {
+        this.dataTwo = JSON.parse(Buffer.concat(concat).toString())
+         concat = []
+        this.eventEmitter.emit("WEBSOCKET_MESSAGE", this.dataTwo)
+      } catch(_) {
+        return
       }
-        let { t, op, d, s } = data;
+      }
+        let { t, op, d, s } = this.dataTwo;
         if (d?.heartbeat_interval) {
           this.interval = d.heartbeat_interval
         }
