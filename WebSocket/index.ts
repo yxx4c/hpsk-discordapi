@@ -96,17 +96,14 @@ export class DiscordWebSocket extends WebSocket {
     let concat: any[] = []
     this.gunzip.on("data", data => {
       concat.push(data)
-      if(!data.slice(data.length-4).compare(Buffer.from("0000FFFF", "hex")) || data.length < 4) {
-      return
-    } else { 
+      if(!data.slice(data.length-4).compare(Buffer.from("0000FFFF", "hex")) || data.length < 4) return
       try {
         this.dataTwo = JSON.parse(Buffer.concat(concat).toString())
-         concat = []
-        this.eventEmitter.emit("WEBSOCKET_MESSAGE", this.dataTwo)
       } catch(_) {
         return
       }
-      }
+      concat = []
+      this.eventEmitter.emit("WEBSOCKET_MESSAGE", this.dataTwo)
         let { t, op, d, s } = this.dataTwo;
         if (d?.heartbeat_interval) {
           this.interval = d.heartbeat_interval

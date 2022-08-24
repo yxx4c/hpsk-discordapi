@@ -1,7 +1,7 @@
 {
   "name": "hpsk-discordapi",
   "repository": "git://github.com/gdhpsk/hpsk-discordapi.git",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "",
   "scripts": {
     "dev": "tsc.cmd -w"
@@ -16,7 +16,7 @@
   "author": "gdhpsk <gdhpsk@gmail.com>",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^17.0.18",
+    "@types/node": "^18.7.13",
     "@types/node-fetch": "^2.6.2",
     "@types/ws": "^8.5.3",
     "eslint": "^8.19.0",
