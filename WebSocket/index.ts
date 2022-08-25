@@ -99,11 +99,11 @@ export class DiscordWebSocket extends WebSocket {
       if(!data.slice(data.length-4).compare(Buffer.from("0000FFFF", "hex")) || data.length < 4) return
       try {
         this.dataTwo = JSON.parse(Buffer.concat(concat).toString())
+        concat = []
+        this.eventEmitter.emit("WEBSOCKET_MESSAGE", this.dataTwo)
       } catch(_) {
         return
       }
-      concat = []
-      this.eventEmitter.emit("WEBSOCKET_MESSAGE", this.dataTwo)
         let { t, op, d, s } = this.dataTwo;
         if (d?.heartbeat_interval) {
           this.interval = d.heartbeat_interval
@@ -165,12 +165,6 @@ export class DiscordWebSocket extends WebSocket {
               id: this.data.d.shard?.[0] || 0,
               totalShards: this.data.d.shard?.[1] || 1
           })
-              this.discord_socket.onerror = (x) => {
-                console.log(`DiscordWebSocket recieved an error. Message: ${x}`)
-              }
-              this.discord_socket.onmessage = (data) => {
-                 this.gunzip.write(data.data)
-              }
               this.discord_socket.send(JSON.stringify({
                 op: GatewayOpcodes.Resume,
                 d: {
