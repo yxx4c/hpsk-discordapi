@@ -99,8 +99,8 @@ export class DiscordWebSocket extends WebSocket {
       if(!data.slice(data.length-4).compare(Buffer.from("0000FFFF", "hex")) || data.length < 4) return
       try {
         this.dataTwo = JSON.parse(Buffer.concat(concat).toString())
-        concat = []
-        this.eventEmitter.emit("WEBSOCKET_MESSAGE", this.dataTwo)
+          concat = []
+      this.eventEmitter.emit("WEBSOCKET_MESSAGE", this.dataTwo)
       } catch(_) {
         return
       }
@@ -140,7 +140,7 @@ export class DiscordWebSocket extends WebSocket {
           case GatewayOpcodes.Reconnect:
             this.discord_socket.close(1011)
             this.discord_socket = new DiscordWebSocket({version: this.version, encoding: this.encoding, data: this.data, url: this.resume_gateway_url})
-            this.discord_socket.once("open", () => {
+            
               this.discord_socket.onclose =  (x) => {
                 if(x.code != 1011) {
                 this.eventEmitter.emit("OFFLINE", {
@@ -165,6 +165,7 @@ export class DiscordWebSocket extends WebSocket {
               id: this.data.d.shard?.[0] || 0,
               totalShards: this.data.d.shard?.[1] || 1
           })
+          this.discord_socket.once("open", () => {
               this.discord_socket.send(JSON.stringify({
                 op: GatewayOpcodes.Resume,
                 d: {
@@ -173,6 +174,13 @@ export class DiscordWebSocket extends WebSocket {
                   seq: s
                 }
               }))
+              this.discord_socket.onerror = (x) => {
+                console.log(`DiscordWebSocket recieved an error. Message: ${x}`)
+              }
+              this.discord_socket.onmessage = (data) => {
+                 this.gunzip.write(data.data)
+              }
+
             })
       
             break;
