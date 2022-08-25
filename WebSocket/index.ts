@@ -165,7 +165,7 @@ export class DiscordWebSocket extends WebSocket {
               id: this.data.d.shard?.[0] || 0,
               totalShards: this.data.d.shard?.[1] || 1
           })
-          this.discord_socket.once("open", () => {
+          this.discord_socket.on("open", () => {
               this.discord_socket.send(JSON.stringify({
                 op: GatewayOpcodes.Resume,
                 d: {
@@ -174,6 +174,10 @@ export class DiscordWebSocket extends WebSocket {
                   seq: s
                 }
               }))
+              this.eventEmitter.emit("SHARD_CREATED", {
+                id: this.data.d.shard?.[0] || 0,
+                totalShards: this.data.d.shard?.[1] || 1
+            })
               this.discord_socket.onerror = (x) => {
                 console.log(`DiscordWebSocket recieved an error. Message: ${x}`)
               }

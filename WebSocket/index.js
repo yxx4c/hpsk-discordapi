@@ -147,32 +147,32 @@ class DiscordWebSocket extends ws_1.WebSocket {
                 case GatewayTypes_1.GatewayOpcodes.Reconnect:
                     this.discord_socket.close(1011);
                     this.discord_socket = new DiscordWebSocket({ version: this.version, encoding: this.encoding, data: this.data, url: this.resume_gateway_url });
-                    this.discord_socket.once("open", () => {
-                        this.discord_socket.onclose = (x) => {
-                            if (x.code != 1011) {
-                                this.eventEmitter.emit("OFFLINE", {
+                    this.discord_socket.onclose = (x) => {
+                        if (x.code != 1011) {
+                            this.eventEmitter.emit("OFFLINE", {
+                                id: data.shard?.[0] || 0,
+                                totalShards: data.shard?.[1] || 1
+                            });
+                        }
+                        if ([1000, 1001].includes(x.code)) {
+                            this.discord_socket.connect();
+                        }
+                        else {
+                            if (x.code.toString().startsWith("40")) {
+                                this.eventEmitter.emit("SHARD_ERROR", {
                                     id: data.shard?.[0] || 0,
-                                    totalShards: data.shard?.[1] || 1
+                                    totalShards: data.shard?.[1] || 1,
+                                    code: x.code,
+                                    reason: x.reason
                                 });
                             }
-                            if ([1000, 1001].includes(x.code)) {
-                                this.discord_socket.connect();
-                            }
-                            else {
-                                if (x.code.toString().startsWith("40")) {
-                                    this.eventEmitter.emit("SHARD_ERROR", {
-                                        id: data.shard?.[0] || 0,
-                                        totalShards: data.shard?.[1] || 1,
-                                        code: x.code,
-                                        reason: x.reason
-                                    });
-                                }
-                            }
-                        };
-                        this.eventEmitter.emit("SHARD_CREATE", {
-                            id: this.data.d.shard?.[0] || 0,
-                            totalShards: this.data.d.shard?.[1] || 1
-                        });
+                        }
+                    };
+                    this.eventEmitter.emit("SHARD_CREATE", {
+                        id: this.data.d.shard?.[0] || 0,
+                        totalShards: this.data.d.shard?.[1] || 1
+                    });
+                    this.discord_socket.on("open", () => {
                         this.discord_socket.send(JSON.stringify({
                             op: GatewayTypes_1.GatewayOpcodes.Resume,
                             d: {
@@ -181,6 +181,16 @@ class DiscordWebSocket extends ws_1.WebSocket {
                                 seq: s
                             }
                         }));
+                        this.eventEmitter.emit("SHARD_CREATED", {
+                            id: this.data.d.shard?.[0] || 0,
+                            totalShards: this.data.d.shard?.[1] || 1
+                        });
+                        this.discord_socket.onerror = (x) => {
+                            console.log(`DiscordWebSocket recieved an error. Message: ${x}`);
+                        };
+                        this.discord_socket.onmessage = (data) => {
+                            this.gunzip.write(data.data);
+                        };
                     });
                     break;
                 case GatewayTypes_1.GatewayOpcodes.Hello:
