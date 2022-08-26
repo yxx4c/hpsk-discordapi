@@ -172,7 +172,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                         id: this.data.d.shard?.[0] || 0,
                         totalShards: this.data.d.shard?.[1] || 1
                     });
-                    this.discord_socket.on("open", () => {
+                    this.discord_socket.onopen = () => {
                         this.discord_socket.send(JSON.stringify({
                             op: GatewayTypes_1.GatewayOpcodes.Resume,
                             d: {
@@ -191,7 +191,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                         this.discord_socket.onmessage = (data) => {
                             this.gunzip.write(data.data);
                         };
-                    });
+                    };
                     break;
                 case GatewayTypes_1.GatewayOpcodes.Hello:
                     this.discord_socket.send(JSON.stringify({
