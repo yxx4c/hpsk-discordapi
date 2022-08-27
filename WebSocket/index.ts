@@ -63,7 +63,7 @@ export class DiscordWebSocket extends WebSocket {
         })
       })
       this.discord_socket.onclose =  (x) => {
-        if(x.code != 1011) {
+        if(x.code != 4001) {
           this.eventEmitter.emit("OFFLINE", {
             id: this.data.d.shard?.[0] || 0,
             totalShards: this.data.d.shard?.[1] || 1
@@ -138,11 +138,11 @@ export class DiscordWebSocket extends WebSocket {
             }))
             break;
           case GatewayOpcodes.Reconnect:
-            this.discord_socket.close(1011)
+            this.discord_socket.close(4001)
             this.discord_socket = new DiscordWebSocket({version: this.version, encoding: this.encoding, data: this.data, url: this.resume_gateway_url})
             
               this.discord_socket.onclose =  (x) => {
-                if(x.code != 1011) {
+                if(x.code != 4001) {
                 this.eventEmitter.emit("OFFLINE", {
                   id: data.shard?.[0] || 0,
                   totalShards: data.shard?.[1] || 1
@@ -174,10 +174,6 @@ export class DiscordWebSocket extends WebSocket {
                   seq: s
                 }
               }))
-              this.eventEmitter.emit("SHARD_CREATED", {
-                id: this.data.d.shard?.[0] || 0,
-                totalShards: this.data.d.shard?.[1] || 1
-            })
               this.discord_socket.onerror = (x) => {
                 console.log(`DiscordWebSocket recieved an error. Message: ${x}`)
               }
