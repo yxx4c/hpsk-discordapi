@@ -16,6 +16,7 @@ class DiscordShards extends index_1.DiscordWebSocket {
         this.rest = new index_1.REST({}).setToken(obj.data.d.token);
     }
     async createShards() {
+        this.arrayOfSockets = [];
         this.gatewayBot = await this.rest.get(index_1.Routes.gatewayBot());
         for (let i = 0; i < this.gatewayBot.shards; i++) {
             let rate_limit_key = i % this.gatewayBot.session_start_limit.max_concurrency;
@@ -32,9 +33,6 @@ class DiscordShards extends index_1.DiscordWebSocket {
                 await queueShard;
             }
         }
-        this.eventEmitter.on("OFFLINE", () => {
-            this.createShards();
-        });
     }
 }
 exports.DiscordShards = DiscordShards;

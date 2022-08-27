@@ -30,6 +30,7 @@ shards.eventEmitter.on("SHARD_CREATE", async (payload) => {
 });
 shards.eventEmitter.on("OFFLINE", async (payload) => {
     console.log(`[WS => Shard ${payload.id}] offline`);
+    shards.createShards();
 });
 shards.createShards().then(async () => {
     let wait = new Promise((resolve, reject) => {

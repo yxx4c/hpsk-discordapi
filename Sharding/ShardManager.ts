@@ -6,7 +6,7 @@ export class DiscordShards extends DiscordWebSocket {
     public gatewayBot: any;
      public gatewayVersion: number;
      public gatewayEncoding: "json" | "etf";
-     public readonly arrayOfSockets: Array<DiscordWebSocket> = []
+     public arrayOfSockets: Array<DiscordWebSocket> = []
     constructor(obj: WebSocketOptions) {
         super({version: obj.version, encoding: obj.encoding, data: obj.data, caches: obj.caches ?? []})
         this.gatewayVersion = obj.version as number ?? defaults.gateway
@@ -14,6 +14,7 @@ export class DiscordShards extends DiscordWebSocket {
         this.rest = new REST({}).setToken(obj.data.d.token as any)
     }
    public async createShards() {
+        this.arrayOfSockets = []
         this.gatewayBot = await this.rest.get(Routes.gatewayBot());
         for(let i = 0; i < this.gatewayBot.shards; i++) {
             let rate_limit_key = i % this.gatewayBot.session_start_limit.max_concurrency
@@ -30,8 +31,5 @@ export class DiscordShards extends DiscordWebSocket {
                 await queueShard
             }
         }
-        this.eventEmitter.on("OFFLINE", () => {
-            this.createShards()
-        })
     }
 }
