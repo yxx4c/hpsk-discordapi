@@ -56,7 +56,7 @@ export class DiscordWebSocket extends WebSocket {
         id: this.data.d.shard?.[0] || 0,
         totalShards: this.data.d.shard?.[1] || 1
     })
-      this.eventEmitter.on("READY", () => {
+      this.eventEmitter.once("READY", () => {
         this.eventEmitter.emit("SHARD_CREATED", {
           id: this.data.d.shard?.[0] || 0,
           totalShards: this.data.d.shard?.[1] || 1
@@ -163,6 +163,12 @@ export class DiscordWebSocket extends WebSocket {
             this.eventEmitter.emit("SHARD_CREATE", {
               id: this.data.d.shard?.[0] || 0,
               totalShards: this.data.d.shard?.[1] || 1
+          })
+          this.eventEmitter.once("READY", () => {
+            this.eventEmitter.emit("SHARD_CREATED", {
+              id: this.data.d.shard?.[0] || 0,
+              totalShards: this.data.d.shard?.[1] || 1
+            })
           })
           this.discord_socket.onopen = () => {
               this.discord_socket.send(JSON.stringify({
