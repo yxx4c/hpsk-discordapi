@@ -451,7 +451,7 @@ export enum InputVoiceType {
 }
 
 export enum defaults {
-    gateway=9,
+    gateway=10,
     rest=10,
     encoding="json"
 }
