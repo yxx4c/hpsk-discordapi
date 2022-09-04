@@ -455,7 +455,7 @@ var InputVoiceType;
 })(InputVoiceType = exports.InputVoiceType || (exports.InputVoiceType = {}));
 var defaults;
 (function (defaults) {
-    defaults[defaults["gateway"] = 9] = "gateway";
+    defaults[defaults["gateway"] = 10] = "gateway";
     defaults[defaults["rest"] = 10] = "rest";
     defaults["encoding"] = "json";
 })(defaults = exports.defaults || (exports.defaults = {}));

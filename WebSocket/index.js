@@ -62,14 +62,14 @@ class DiscordWebSocket extends ws_1.WebSocket {
             id: this.data.d.shard?.[0] || 0,
             totalShards: this.data.d.shard?.[1] || 1
         });
-        this.eventEmitter.on("READY", () => {
+        this.eventEmitter.once("READY", () => {
             this.eventEmitter.emit("SHARD_CREATED", {
                 id: this.data.d.shard?.[0] || 0,
                 totalShards: this.data.d.shard?.[1] || 1
             });
         });
         this.discord_socket.onclose = (x) => {
-            if (x.code == 4999)
+            if (x.code == 1006)
                 return;
             this.eventEmitter.emit("OFFLINE", {
                 id: this.data.d.shard?.[0] || 0,
@@ -148,7 +148,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     this.discord_socket.close(4999);
                     this.discord_socket = new DiscordWebSocket({ version: this.version, encoding: this.encoding, data: this.data, url: this.resume_gateway_url });
                     this.discord_socket.onclose = (x) => {
-                        if (x.code == 4999)
+                        if (x.code == 1006)
                             return;
                         this.eventEmitter.emit("OFFLINE", {
                             id: data.shard?.[0] || 0,
@@ -171,6 +171,12 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     this.eventEmitter.emit("SHARD_CREATE", {
                         id: this.data.d.shard?.[0] || 0,
                         totalShards: this.data.d.shard?.[1] || 1
+                    });
+                    this.eventEmitter.once("READY", () => {
+                        this.eventEmitter.emit("SHARD_CREATED", {
+                            id: this.data.d.shard?.[0] || 0,
+                            totalShards: this.data.d.shard?.[1] || 1
+                        });
                     });
                     this.discord_socket.onopen = () => {
                         this.discord_socket.send(JSON.stringify({
