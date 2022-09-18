@@ -94,7 +94,7 @@ export class DiscordWebSocket extends WebSocket {
 
     }
     let concat: any[] = []
-    this.gunzip.on("data", data => {
+    let func = (data: any) => {
       concat.push(data)
       if(!data.slice(data.length-4).compare(Buffer.from("0000FFFF", "hex")) || data.length < 4) return
       try {
@@ -182,6 +182,8 @@ export class DiscordWebSocket extends WebSocket {
               this.discord_socket.onerror = (x) => {
                 console.log(`DiscordWebSocket recieved an error. Message: ${x}`)
               }
+              this.gunzip = zlib.createInflate({finishFlush: zlib.constants.Z_SYNC_FLUSH})
+              this.gunzip.on("data", func)
               this.discord_socket.onmessage = (data) => {
                  this.gunzip.write(data.data)
               }
@@ -204,7 +206,8 @@ export class DiscordWebSocket extends WebSocket {
             break;
         }
         this.eventEmitter.emit(t, d)
-  })
+  }
+    this.gunzip.on("data", func)
         // setTimeout(() => {}, 1 << 30)
     }
 }
