@@ -63,7 +63,7 @@ export class DiscordWebSocket extends WebSocket {
         })
       })
       this.discord_socket.onclose =  (x) => {
-        if(x.code == 1006) return
+        if(x.code == 4999) return
           this.eventEmitter.emit("OFFLINE", {
             id: this.data.d.shard?.[0] || 0,
             totalShards: this.data.d.shard?.[1] || 1,
@@ -143,7 +143,7 @@ export class DiscordWebSocket extends WebSocket {
             this.discord_socket = new DiscordWebSocket({version: this.version, encoding: this.encoding, data: this.data, url: this.resume_gateway_url})
             
               this.discord_socket.onclose =  (x) => {
-                if(x.code == 1006) return
+                if(x.code == 4999) return
                 this.eventEmitter.emit("OFFLINE", {
                   id: data.shard?.[0] || 0,
                   totalShards: data.shard?.[1] || 1,
