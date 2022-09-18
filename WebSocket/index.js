@@ -99,7 +99,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
             };
         };
         let concat = [];
-        this.gunzip.on("data", data => {
+        let func = (data) => {
             concat.push(data);
             if (!data.slice(data.length - 4).compare(Buffer.from("0000FFFF", "hex")) || data.length < 4)
                 return;
@@ -190,6 +190,8 @@ class DiscordWebSocket extends ws_1.WebSocket {
                         this.discord_socket.onerror = (x) => {
                             console.log(`DiscordWebSocket recieved an error. Message: ${x}`);
                         };
+                        this.gunzip = node_zlib_1.default.createInflate({ finishFlush: node_zlib_1.default.constants.Z_SYNC_FLUSH });
+                        this.gunzip.on("data", func);
                         this.discord_socket.onmessage = (data) => {
                             this.gunzip.write(data.data);
                         };
@@ -209,7 +211,8 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     break;
             }
             this.eventEmitter.emit(t, d);
-        });
+        };
+        this.gunzip.on("data", func);
         // setTimeout(() => {}, 1 << 30)
     }
 }
