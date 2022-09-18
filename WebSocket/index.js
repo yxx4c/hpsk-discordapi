@@ -73,7 +73,8 @@ class DiscordWebSocket extends ws_1.WebSocket {
                 return;
             this.eventEmitter.emit("OFFLINE", {
                 id: this.data.d.shard?.[0] || 0,
-                totalShards: this.data.d.shard?.[1] || 1
+                totalShards: this.data.d.shard?.[1] || 1,
+                code: x.code
             });
             if ([1000, 1001].includes(x.code)) {
                 this.discord_socket.connect();
@@ -152,7 +153,8 @@ class DiscordWebSocket extends ws_1.WebSocket {
                             return;
                         this.eventEmitter.emit("OFFLINE", {
                             id: data.shard?.[0] || 0,
-                            totalShards: data.shard?.[1] || 1
+                            totalShards: data.shard?.[1] || 1,
+                            code: x.code
                         });
                         if ([1000, 1001].includes(x.code)) {
                             this.discord_socket.connect();
