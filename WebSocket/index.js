@@ -47,6 +47,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
     encoding;
     discord_socket;
     data;
+    seq = 0;
     cache;
     constructor(obj) {
         let url = obj.url ?? `wss://gateway.discord.gg?v=${obj.version ?? APITypes_1.defaults.gateway}&encoding=${obj.encoding ?? APITypes_1.defaults.encoding}&compress=zlib-stream`;
@@ -113,6 +114,9 @@ class DiscordWebSocket extends ws_1.WebSocket {
                 return;
             }
             let { t, op, d, s } = this.dataTwo;
+            if (s) {
+                this.seq = s;
+            }
             if (d?.heartbeat_interval) {
                 this.interval = d.heartbeat_interval;
             }
@@ -130,7 +134,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                             d: {
                                 token: this.data.d.token,
                                 session_id: this.sessionid,
-                                seq: s
+                                seq: this.seq
                             }
                         }));
                     }
@@ -142,7 +146,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                 case GatewayTypes_1.GatewayOpcodes.Heartbeat:
                     this.discord_socket.send(JSON.stringify({
                         op: GatewayTypes_1.GatewayOpcodes.Heartbeat,
-                        d: s
+                        d: this.seq || null
                     }));
                     break;
                 case GatewayTypes_1.GatewayOpcodes.Reconnect:
@@ -186,7 +190,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                             d: {
                                 token: this.data.d.token,
                                 session_id: this.sessionid,
-                                seq: s
+                                seq: this.seq
                             }
                         }));
                         this.discord_socket.onerror = (x) => {
@@ -202,12 +206,12 @@ class DiscordWebSocket extends ws_1.WebSocket {
                 case GatewayTypes_1.GatewayOpcodes.Hello:
                     this.discord_socket.send(JSON.stringify({
                         "op": GatewayTypes_1.GatewayOpcodes.Heartbeat,
-                        "d": s
+                        "d": this.seq || null
                     }));
                     setInterval(() => {
                         this.discord_socket.send(JSON.stringify({
                             "op": GatewayTypes_1.GatewayOpcodes.Heartbeat,
-                            "d": s
+                            "d": this.seq || null
                         }));
                     }, this.interval);
                     break;
