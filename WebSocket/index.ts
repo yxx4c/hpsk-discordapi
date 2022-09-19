@@ -1,6 +1,6 @@
 import {WebSocket} from "ws"
 import {EventEmitter} from "node:events"
-import {Events, GatewayOpcodes} from "./GatewayTypes"
+import {Events, GatewayOpcodes, gatewayConnectCodes} from "./GatewayTypes"
 import zlib from "node:zlib"
 import { CacheManager, cacheTypes } from "../index"
 import { defaults } from "../REST/classes/APITypes"
@@ -57,18 +57,18 @@ export class DiscordWebSocket extends WebSocket {
         id: this.data.d.shard?.[0] || 0,
         totalShards: this.data.d.shard?.[1] || 1
     })
-      this.eventEmitter.once("READY", () => {
-        this.eventEmitter.emit("SHARD_CREATED", {
-          id: this.data.d.shard?.[0] || 0,
-          totalShards: this.data.d.shard?.[1] || 1
-        })
+    this.eventEmitter.once("RESUMED", () => {
+      this.eventEmitter.emit("SHARD_CREATED", {
+        id: this.data.d.shard?.[0] || 0,
+        totalShards: this.data.d.shard?.[1] || 1
       })
-      this.eventEmitter.on("RESUMED", () => {
-        this.eventEmitter.emit("SHARD_CREATED", {
-          id: this.data.d.shard?.[0] || 0,
-          totalShards: this.data.d.shard?.[1] || 1
-        })
+    })
+    this.eventEmitter.once("READY", () => {
+      this.eventEmitter.emit("SHARD_CREATED", {
+        id: this.data.d.shard?.[0] || 0,
+        totalShards: this.data.d.shard?.[1] || 1
       })
+    })
       this.discord_socket.onclose =  (x) => {
         if(x.code == 4999) return
           this.eventEmitter.emit("OFFLINE", {
@@ -77,10 +77,9 @@ export class DiscordWebSocket extends WebSocket {
             code: x.code
           })
 
-        if([1000, 1001].includes(x.code)) {
+        if(gatewayConnectCodes.includes(x.code)) {
           this.discord_socket.connect()
         } else {
-          if(x.code.toString().startsWith("40")) {
             this.eventEmitter.emit("SHARD_ERROR", {
               id: this.data.d.shard?.[0] || 0,
               totalShards: this.data.d.shard?.[1] || 1,
@@ -88,7 +87,6 @@ export class DiscordWebSocket extends WebSocket {
               reason: x.reason
             })
           }
-        }
     }
 
     this.discord_socket.onopen =  async () => {
@@ -199,7 +197,12 @@ export class DiscordWebSocket extends WebSocket {
               this.discord_socket.onmessage = (data) => {
                  this.gunzip.write(data.data)
               }
-
+              this.eventEmitter.once("RESUMED", () => {
+                this.eventEmitter.emit("SHARD_CREATED", {
+                  id: this.data.d.shard?.[0] || 0,
+                  totalShards: this.data.d.shard?.[1] || 1
+                })
+              })
             }
       
             break;

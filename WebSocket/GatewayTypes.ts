@@ -119,3 +119,4 @@ export interface Events {
     "SHARD_ERROR": [payload: ShardError]
     "OFFLINE": [payload: Shard]
 }
+export let gatewayConnectCodes: Array<number> = [1000, 1001, 4000, 4001, 4002, 4003, 4005, 4007, 4008, 4009]

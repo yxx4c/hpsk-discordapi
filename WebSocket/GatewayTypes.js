@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GatewayConnection = exports.GatewayOpcodes = void 0;
+exports.gatewayConnectCodes = exports.GatewayConnection = exports.GatewayOpcodes = void 0;
 var GatewayOpcodes;
 (function (GatewayOpcodes) {
     GatewayOpcodes[GatewayOpcodes["Dispatch"] = 0] = "Dispatch";
@@ -24,3 +24,4 @@ class GatewayConnection {
     }
 }
 exports.GatewayConnection = GatewayConnection;
+exports.gatewayConnectCodes = [1000, 1001, 4000, 4001, 4002, 4003, 4005, 4007, 4008, 4009];
