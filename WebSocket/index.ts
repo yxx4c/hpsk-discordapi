@@ -63,6 +63,12 @@ export class DiscordWebSocket extends WebSocket {
           totalShards: this.data.d.shard?.[1] || 1
         })
       })
+      this.eventEmitter.on("RESUMED", () => {
+        this.eventEmitter.emit("SHARD_CREATED", {
+          id: this.data.d.shard?.[0] || 0,
+          totalShards: this.data.d.shard?.[1] || 1
+        })
+      })
       this.discord_socket.onclose =  (x) => {
         if(x.code == 4999) return
           this.eventEmitter.emit("OFFLINE", {
