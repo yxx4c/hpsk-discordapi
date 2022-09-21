@@ -8,7 +8,8 @@ export class DiscordShards extends DiscordWebSocket {
      public gatewayEncoding: "json" | "etf";
      public arrayOfSockets: Array<DiscordWebSocket> = []
     constructor(obj: WebSocketOptions) {
-        super({version: obj.version, encoding: obj.encoding, data: obj.data, caches: obj.caches ?? [], seq: obj.seq})
+        super({version: obj.version, encoding: obj.encoding, data: obj.data, caches: obj.caches ?? []})
+        this.seq = obj.seq ?? 0
         this.gatewayVersion = obj.version as number ?? defaults.gateway
         this.gatewayEncoding = obj.encoding ?? defaults.encoding
         this.rest = new REST({}).setToken(obj.data.d.token as any)
@@ -19,7 +20,7 @@ export class DiscordShards extends DiscordWebSocket {
         for(let i = 0; i < this.gatewayBot.shards; i++) {
             let rate_limit_key = i % this.gatewayBot.session_start_limit.max_concurrency
             this.data.d.shard = [i, this.gatewayBot.shards]
-            let discord_socket = new DiscordWebSocket({version: this.gatewayVersion, encoding: this.gatewayEncoding, data: this.data})
+            let discord_socket = new DiscordWebSocket({version: this.gatewayVersion, encoding: this.gatewayEncoding, data: this.data, seq: this.seq})
             discord_socket.connect()
             this.arrayOfSockets.push(discord_socket)
             if(rate_limit_key == 0 && i != this.gatewayBot.shards-1) {

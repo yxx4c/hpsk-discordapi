@@ -42,7 +42,7 @@ export class DiscordWebSocket extends WebSocket {
     encoding: "etf" | "json";
     discord_socket!: DiscordWebSocket;
     protected data: Record<any, any>
-    private seq: number = 0
+    public seq: number = 0
     public cache: CacheManager
     constructor(obj: WebSocketOptions) {
       let url = obj.url ?? `wss://gateway.discord.gg?v=${obj.version ?? defaults.gateway}&encoding=${obj.encoding ?? defaults.encoding}&compress=zlib-stream`
