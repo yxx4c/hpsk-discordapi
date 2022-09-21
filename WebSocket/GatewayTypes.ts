@@ -117,6 +117,7 @@ export interface Events {
     "WEBSOCKET_MESSAGE": any,
     "SHARD_CREATE": [payload: Shard],
     "SHARD_CREATED": [payload: Shard],
+    "SHARD_RESUME": [payload: Shard],
     "SHARD_ERROR": [payload: ShardError]
     "OFFLINE": [payload: Shard]
 }

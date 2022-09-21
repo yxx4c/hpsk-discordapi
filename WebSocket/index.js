@@ -203,10 +203,10 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     break;
             }
             if (t == "RESUME") {
-                d = {
+                this.eventEmitter.emit("SHARD_RESUME", {
                     id: this.data.d.shard?.[0] || 0,
                     totalShards: this.data.d.shard?.[1] || 1
-                };
+                });
             }
             if (t == "READY") {
                 this.eventEmitter.emit("SHARD_CREATED", {
