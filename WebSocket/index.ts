@@ -208,6 +208,12 @@ export class DiscordWebSocket extends WebSocket {
       
             break;
         }
+        if(t == "RESUME") {
+          d = {
+            id: this.data.d.shard?.[0] || 0,
+            totalShards: this.data.d.shard?.[1] || 1
+          }
+        }
         this.eventEmitter.emit(t, d)
   }
     this.gunzip.on("data", func)
