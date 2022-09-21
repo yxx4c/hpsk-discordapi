@@ -116,6 +116,16 @@ class DiscordWebSocket extends ws_1.WebSocket {
                 case "READY":
                     this.resume_gateway_url = d.resume_gateway_url + `?v=${this.version ?? APITypes_1.defaults.gateway}&encoding=${this.encoding ?? APITypes_1.defaults.encoding}&compress=zlib-stream`;
                     this.sessionid = d.session_id;
+                    this.eventEmitter.emit("SHARD_CREATED", {
+                        id: this.data.d.shard?.[0] || 0,
+                        totalShards: this.data.d.shard?.[1] || 1
+                    });
+                    break;
+                case "RESUME":
+                    this.eventEmitter.emit("SHARD_RESUME", {
+                        id: this.data.d.shard?.[0] || 0,
+                        totalShards: this.data.d.shard?.[1] || 1
+                    });
                     break;
             }
             switch (op) {
@@ -201,18 +211,6 @@ class DiscordWebSocket extends ws_1.WebSocket {
                         }));
                     }, this.interval);
                     break;
-            }
-            if (t == "RESUME") {
-                this.eventEmitter.emit("SHARD_RESUME", {
-                    id: this.data.d.shard?.[0] || 0,
-                    totalShards: this.data.d.shard?.[1] || 1
-                });
-            }
-            if (t == "READY") {
-                this.eventEmitter.emit("SHARD_CREATED", {
-                    id: this.data.d.shard?.[0] || 0,
-                    totalShards: this.data.d.shard?.[1] || 1
-                });
             }
             this.eventEmitter.emit(t, d);
         };
