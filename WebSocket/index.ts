@@ -10,6 +10,7 @@ export interface WebSocketOptions {
     encoding?: "json" | "etf",
     url?: String,
     data: Record<any, any>,
+    seq?: number,
     caches?: cacheTypes[]
 }
 interface VoiceOptions {
@@ -46,6 +47,7 @@ export class DiscordWebSocket extends WebSocket {
     constructor(obj: WebSocketOptions) {
       let url = obj.url ?? `wss://gateway.discord.gg?v=${obj.version ?? defaults.gateway}&encoding=${obj.encoding ?? defaults.encoding}&compress=zlib-stream`
         super(url as any);
+        this.seq = obj.seq ?? 0
         this.version = obj.version ?? defaults.gateway
         this.data = obj.data
         this.encoding = obj.encoding ?? defaults.encoding
