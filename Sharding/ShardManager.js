@@ -10,7 +10,7 @@ class DiscordShards extends index_1.DiscordWebSocket {
     gatewayEncoding;
     arrayOfSockets = [];
     constructor(obj) {
-        super({ version: obj.version, encoding: obj.encoding, data: obj.data, caches: obj.caches ?? [] });
+        super({ version: obj.version, encoding: obj.encoding, data: obj.data, caches: obj.caches ?? [], seq: obj.seq });
         this.gatewayVersion = obj.version ?? APITypes_1.defaults.gateway;
         this.gatewayEncoding = obj.encoding ?? APITypes_1.defaults.encoding;
         this.rest = new index_1.REST({}).setToken(obj.data.d.token);

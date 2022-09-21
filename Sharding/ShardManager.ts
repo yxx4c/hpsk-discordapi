@@ -8,7 +8,7 @@ export class DiscordShards extends DiscordWebSocket {
      public gatewayEncoding: "json" | "etf";
      public arrayOfSockets: Array<DiscordWebSocket> = []
     constructor(obj: WebSocketOptions) {
-        super({version: obj.version, encoding: obj.encoding, data: obj.data, caches: obj.caches ?? []})
+        super({version: obj.version, encoding: obj.encoding, data: obj.data, caches: obj.caches ?? [], seq: obj.seq})
         this.gatewayVersion = obj.version as number ?? defaults.gateway
         this.gatewayEncoding = obj.encoding ?? defaults.encoding
         this.rest = new REST({}).setToken(obj.data.d.token as any)
