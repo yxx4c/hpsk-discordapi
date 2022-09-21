@@ -11,7 +11,6 @@ class DiscordShards extends index_1.DiscordWebSocket {
     arrayOfSockets = [];
     constructor(obj) {
         super({ version: obj.version, encoding: obj.encoding, data: obj.data, caches: obj.caches ?? [] });
-        this.seq = obj.seq ?? 0;
         this.gatewayVersion = obj.version ?? APITypes_1.defaults.gateway;
         this.gatewayEncoding = obj.encoding ?? APITypes_1.defaults.encoding;
         this.rest = new index_1.REST({}).setToken(obj.data.d.token);
@@ -22,7 +21,7 @@ class DiscordShards extends index_1.DiscordWebSocket {
         for (let i = 0; i < this.gatewayBot.shards; i++) {
             let rate_limit_key = i % this.gatewayBot.session_start_limit.max_concurrency;
             this.data.d.shard = [i, this.gatewayBot.shards];
-            let discord_socket = new index_1.DiscordWebSocket({ version: this.gatewayVersion, encoding: this.gatewayEncoding, data: this.data, seq: this.seq });
+            let discord_socket = new index_1.DiscordWebSocket({ version: this.gatewayVersion, encoding: this.gatewayEncoding, data: this.data });
             discord_socket.connect();
             this.arrayOfSockets.push(discord_socket);
             if (rate_limit_key == 0 && i != this.gatewayBot.shards - 1) {

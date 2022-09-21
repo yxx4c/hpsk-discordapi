@@ -52,7 +52,6 @@ class DiscordWebSocket extends ws_1.WebSocket {
     constructor(obj) {
         let url = obj.url ?? `wss://gateway.discord.gg?v=${obj.version ?? APITypes_1.defaults.gateway}&encoding=${obj.encoding ?? APITypes_1.defaults.encoding}&compress=zlib-stream`;
         super(url);
-        this.seq = obj.seq ?? 0;
         this.version = obj.version ?? APITypes_1.defaults.gateway;
         this.data = obj.data;
         this.encoding = obj.encoding ?? APITypes_1.defaults.encoding;
