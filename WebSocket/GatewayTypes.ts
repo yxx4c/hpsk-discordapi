@@ -55,6 +55,7 @@ export class GatewayConnection {
 
 export interface Events {
     "READY": any,
+    "RESUME": any,
     "APPLICATION_COMMAND_PERMISSIONS_UPDATE": any,
     "AUTO_MODERATION_RULE_CREATE": any,
     "AUTO_MODERATION_RULE_UPDATE": any,
@@ -119,4 +120,4 @@ export interface Events {
     "SHARD_ERROR": [payload: ShardError]
     "OFFLINE": [payload: Shard]
 }
-export let gatewayConnectCodes: Array<number> = [1000, 1001, 4000, 4001, 4002, 4003, 4005, 4007, 4008, 4009]
+export let gatewayConnectCodes: Array<number> = [1000, 1001, 1006, 4000, 4001, 4002, 4003, 4005, 4007, 4008, 4009]

@@ -57,12 +57,6 @@ export class DiscordWebSocket extends WebSocket {
         id: this.data.d.shard?.[0] || 0,
         totalShards: this.data.d.shard?.[1] || 1
     })
-    this.eventEmitter.once("RESUMED", () => {
-      this.eventEmitter.emit("SHARD_CREATED", {
-        id: this.data.d.shard?.[0] || 0,
-        totalShards: this.data.d.shard?.[1] || 1
-      })
-    })
     this.eventEmitter.once("READY", () => {
       this.eventEmitter.emit("SHARD_CREATED", {
         id: this.data.d.shard?.[0] || 0,
@@ -157,7 +151,7 @@ export class DiscordWebSocket extends WebSocket {
                   totalShards: data.shard?.[1] || 1,
                   code: x.code
                 })
-                if([1000, 1001].includes(x.code)) {
+                if(gatewayConnectCodes.includes(x.code)) {
                   this.discord_socket.connect()
                 } else {
                   if(x.code.toString().startsWith("40")) {
@@ -197,12 +191,6 @@ export class DiscordWebSocket extends WebSocket {
               this.discord_socket.onmessage = (data) => {
                  this.gunzip.write(data.data)
               }
-              this.eventEmitter.once("RESUMED", () => {
-                this.eventEmitter.emit("SHARD_CREATED", {
-                  id: this.data.d.shard?.[0] || 0,
-                  totalShards: this.data.d.shard?.[1] || 1
-                })
-              })
             }
       
             break;

@@ -63,12 +63,6 @@ class DiscordWebSocket extends ws_1.WebSocket {
             id: this.data.d.shard?.[0] || 0,
             totalShards: this.data.d.shard?.[1] || 1
         });
-        this.eventEmitter.once("RESUMED", () => {
-            this.eventEmitter.emit("SHARD_CREATED", {
-                id: this.data.d.shard?.[0] || 0,
-                totalShards: this.data.d.shard?.[1] || 1
-            });
-        });
         this.eventEmitter.once("READY", () => {
             this.eventEmitter.emit("SHARD_CREATED", {
                 id: this.data.d.shard?.[0] || 0,
@@ -164,7 +158,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                             totalShards: data.shard?.[1] || 1,
                             code: x.code
                         });
-                        if ([1000, 1001].includes(x.code)) {
+                        if (GatewayTypes_1.gatewayConnectCodes.includes(x.code)) {
                             this.discord_socket.connect();
                         }
                         else {
@@ -205,12 +199,6 @@ class DiscordWebSocket extends ws_1.WebSocket {
                         this.discord_socket.onmessage = (data) => {
                             this.gunzip.write(data.data);
                         };
-                        this.eventEmitter.once("RESUMED", () => {
-                            this.eventEmitter.emit("SHARD_CREATED", {
-                                id: this.data.d.shard?.[0] || 0,
-                                totalShards: this.data.d.shard?.[1] || 1
-                            });
-                        });
                     };
                     break;
                 case GatewayTypes_1.GatewayOpcodes.Hello:
