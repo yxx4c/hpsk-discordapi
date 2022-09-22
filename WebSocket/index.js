@@ -121,7 +121,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
                         totalShards: this.data.d.shard?.[1] || 1
                     });
                     break;
-                case "RESUME":
+                case "RESUMED":
                     this.eventEmitter.emit("SHARD_RESUME", {
                         id: this.data.d.shard?.[0] || 0,
                         totalShards: this.data.d.shard?.[1] || 1
