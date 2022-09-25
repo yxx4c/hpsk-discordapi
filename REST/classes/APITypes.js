@@ -14,6 +14,7 @@ var AutoModerationTriggerTypes;
     AutoModerationTriggerTypes[AutoModerationTriggerTypes["Keyword"] = 1] = "Keyword";
     AutoModerationTriggerTypes[AutoModerationTriggerTypes["HarmfulLink"] = 2] = "HarmfulLink";
     AutoModerationTriggerTypes[AutoModerationTriggerTypes["Spam"] = 3] = "Spam";
+    AutoModerationTriggerTypes[AutoModerationTriggerTypes["MentionSpam"] = 5] = "MentionSpam";
     AutoModerationTriggerTypes[AutoModerationTriggerTypes["KeywordPreset"] = 4] = "KeywordPreset";
 })(AutoModerationTriggerTypes = exports.AutoModerationTriggerTypes || (exports.AutoModerationTriggerTypes = {}));
 var AutoModerationKeywordPresetTypes;

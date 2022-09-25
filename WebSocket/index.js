@@ -84,13 +84,13 @@ class DiscordWebSocket extends ws_1.WebSocket {
             }
         };
         this.discord_socket.onopen = async () => {
-            this.discord_socket.send(JSON.stringify(this.data));
             this.discord_socket.onerror = (x) => {
                 console.log(`DiscordWebSocket recieved an error. Message: ${x}`);
             };
             this.discord_socket.onmessage = (data) => {
                 this.gunzip.write(data.data);
             };
+            this.discord_socket.send(JSON.stringify(this.data));
         };
         let concat = [];
         let func = (data) => {
@@ -181,14 +181,6 @@ class DiscordWebSocket extends ws_1.WebSocket {
                         totalShards: this.data.d.shard?.[1] || 1
                     });
                     this.discord_socket.onopen = () => {
-                        this.discord_socket.send(JSON.stringify({
-                            op: GatewayTypes_1.GatewayOpcodes.Resume,
-                            d: {
-                                token: this.data.d.token,
-                                session_id: this.sessionid,
-                                seq: this.seq
-                            }
-                        }));
                         this.discord_socket.onerror = (x) => {
                             console.log(`DiscordWebSocket recieved an error. Message: ${x}`);
                         };
@@ -197,6 +189,14 @@ class DiscordWebSocket extends ws_1.WebSocket {
                         this.discord_socket.onmessage = (data) => {
                             this.gunzip.write(data.data);
                         };
+                        this.discord_socket.send(JSON.stringify({
+                            op: GatewayTypes_1.GatewayOpcodes.Resume,
+                            d: {
+                                token: this.data.d.token,
+                                session_id: this.sessionid,
+                                seq: this.seq
+                            }
+                        }));
                     };
                     break;
                 case GatewayTypes_1.GatewayOpcodes.Hello:
@@ -215,7 +215,6 @@ class DiscordWebSocket extends ws_1.WebSocket {
             this.eventEmitter.emit(t, d);
         };
         this.gunzip.on("data", func);
-        // setTimeout(() => {}, 1 << 30)
     }
 }
 exports.DiscordWebSocket = DiscordWebSocket;

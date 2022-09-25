@@ -78,14 +78,13 @@ export class DiscordWebSocket extends WebSocket {
     }
 
     this.discord_socket.onopen =  async () => {
-      this.discord_socket.send(JSON.stringify(this.data))
       this.discord_socket.onerror = (x) => {
         console.log(`DiscordWebSocket recieved an error. Message: ${x}`)
       }
       this.discord_socket.onmessage = (data) => {
          this.gunzip.write(data.data)
       }
-
+      this.discord_socket.send(JSON.stringify(this.data))
     }
     let concat: any[] = []
     let func = (data: any) => {
@@ -173,6 +172,14 @@ export class DiscordWebSocket extends WebSocket {
               totalShards: this.data.d.shard?.[1] || 1
           })
           this.discord_socket.onopen = () => {
+            this.discord_socket.onerror = (x) => {
+              console.log(`DiscordWebSocket recieved an error. Message: ${x}`)
+            }
+            this.gunzip = zlib.createInflate({finishFlush: zlib.constants.Z_SYNC_FLUSH})
+            this.gunzip.on("data", func)
+            this.discord_socket.onmessage = (data) => {
+               this.gunzip.write(data.data)
+            }
               this.discord_socket.send(JSON.stringify({
                 op: GatewayOpcodes.Resume,
                 d: {
@@ -181,14 +188,6 @@ export class DiscordWebSocket extends WebSocket {
                   seq: this.seq
                 }
               }))
-              this.discord_socket.onerror = (x) => {
-                console.log(`DiscordWebSocket recieved an error. Message: ${x}`)
-              }
-              this.gunzip = zlib.createInflate({finishFlush: zlib.constants.Z_SYNC_FLUSH})
-              this.gunzip.on("data", func)
-              this.discord_socket.onmessage = (data) => {
-                 this.gunzip.write(data.data)
-              }
             }
       
             break;
@@ -209,7 +208,6 @@ export class DiscordWebSocket extends WebSocket {
         this.eventEmitter.emit(t, d)
   }
     this.gunzip.on("data", func)
-        // setTimeout(() => {}, 1 << 30)
     }
 }
 

@@ -10,6 +10,7 @@ export enum AutoModerationTriggerTypes {
     Keyword=1,
     HarmfulLink=2,
     Spam=3,
+    MentionSpam=5,
     KeywordPreset=4
 }
 
