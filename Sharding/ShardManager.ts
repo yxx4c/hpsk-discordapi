@@ -1,5 +1,6 @@
-import { DiscordWebSocket, GatewayConnection, GatewayConnectionTypes, REST, Routes, WebSocketOptions } from "../index";
+import { DiscordEventEmitter, DiscordWebSocket, GatewayConnection, GatewayConnectionTypes, REST, Routes, WebSocketOptions } from "../index";
 import { defaults } from "../REST/classes/APITypes";
+const extras = ['WEBSOCKET_MESSAGE',"SHARD_CREATE", 'SHARD_CREATED', 'SHARD_RESUME', 'SHARD_ERROR', 'OFFLINE']
 
 export class DiscordShards extends DiscordWebSocket {
    private rest: REST;
@@ -20,6 +21,18 @@ export class DiscordShards extends DiscordWebSocket {
             let rate_limit_key = i % this.gatewayBot.session_start_limit.max_concurrency
             this.data.d.shard = [i, this.gatewayBot.shards]
             let discord_socket = new DiscordWebSocket({version: this.gatewayVersion, encoding: this.gatewayEncoding, data: this.data})
+            for(let item of extras) {
+            discord_socket.eventEmitter.on(item, (payload) => {
+                if(item == "WEBSOCKET_MESSAGE") {
+                let {op, t, d} = payload
+                if(op == 0) {
+                    this.eventEmitter.emit(t, d)
+                }
+            } else {
+                this.eventEmitter.emit(item, payload)
+            }
+            })
+        }
             discord_socket.connect()
             this.arrayOfSockets.push(discord_socket)
             if(rate_limit_key == 0 && i != this.gatewayBot.shards-1) {

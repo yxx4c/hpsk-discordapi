@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscordShards = void 0;
 const index_1 = require("../index");
 const APITypes_1 = require("../REST/classes/APITypes");
+const extras = ['WEBSOCKET_MESSAGE', "SHARD_CREATE", 'SHARD_CREATED', 'SHARD_RESUME', 'SHARD_ERROR', 'OFFLINE'];
 class DiscordShards extends index_1.DiscordWebSocket {
     rest;
     gatewayBot;
@@ -22,6 +23,19 @@ class DiscordShards extends index_1.DiscordWebSocket {
             let rate_limit_key = i % this.gatewayBot.session_start_limit.max_concurrency;
             this.data.d.shard = [i, this.gatewayBot.shards];
             let discord_socket = new index_1.DiscordWebSocket({ version: this.gatewayVersion, encoding: this.gatewayEncoding, data: this.data });
+            for (let item of extras) {
+                discord_socket.eventEmitter.on(item, (payload) => {
+                    if (item == "WEBSOCKET_MESSAGE") {
+                        let { op, t, d } = payload;
+                        if (op == 0) {
+                            this.eventEmitter.emit(t, d);
+                        }
+                    }
+                    else {
+                        this.eventEmitter.emit(item, payload);
+                    }
+                });
+            }
             discord_socket.connect();
             this.arrayOfSockets.push(discord_socket);
             if (rate_limit_key == 0 && i != this.gatewayBot.shards - 1) {

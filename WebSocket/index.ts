@@ -29,9 +29,8 @@ export class DiscordEventEmitter extends  EventEmitter {
     off: (<K extends keyof Events>(event: K, listener: (...args: Events[K]) => void) => this) & (<S extends string | symbol>(event: Exclude<S, keyof Events>, listener: (...args: any[]) => void) => this) = this.off
     removeAllListeners: (<K extends keyof Events>(event?: K) => this) & (<S extends string | symbol>(event?: Exclude<S, keyof Events>) => this) = this.removeAllListeners
   }
-   export let events: DiscordEventEmitter = new DiscordEventEmitter()
 export class DiscordWebSocket extends WebSocket {
-    public eventEmitter: DiscordEventEmitter = events
+    public eventEmitter: DiscordEventEmitter = new DiscordEventEmitter()
     public resume_gateway_url!: String
     version: Number;
     private dataTwo!: Record<any, any>;
@@ -49,7 +48,7 @@ export class DiscordWebSocket extends WebSocket {
         this.version = obj.version ?? defaults.gateway
         this.data = obj.data
         this.encoding = obj.encoding ?? defaults.encoding
-        this.cache = new CacheManager(obj.caches ?? [], obj.data, events)
+        this.cache = new CacheManager(obj.caches ?? [], obj.data, this.eventEmitter)
     }
   public connect(): void {
       this.discord_socket = new DiscordWebSocket({version: this.version, encoding: this.encoding, data: this.data})

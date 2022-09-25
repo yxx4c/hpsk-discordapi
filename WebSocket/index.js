@@ -17,7 +17,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DiscordWebSocket = exports.events = exports.DiscordEventEmitter = void 0;
+exports.DiscordWebSocket = exports.DiscordEventEmitter = void 0;
 const ws_1 = require("ws");
 const node_events_1 = require("node:events");
 const GatewayTypes_1 = require("./GatewayTypes");
@@ -35,9 +35,8 @@ class DiscordEventEmitter extends node_events_1.EventEmitter {
     removeAllListeners = this.removeAllListeners;
 }
 exports.DiscordEventEmitter = DiscordEventEmitter;
-exports.events = new DiscordEventEmitter();
 class DiscordWebSocket extends ws_1.WebSocket {
-    eventEmitter = exports.events;
+    eventEmitter = new DiscordEventEmitter();
     resume_gateway_url;
     version;
     dataTwo;
@@ -55,7 +54,7 @@ class DiscordWebSocket extends ws_1.WebSocket {
         this.version = obj.version ?? APITypes_1.defaults.gateway;
         this.data = obj.data;
         this.encoding = obj.encoding ?? APITypes_1.defaults.encoding;
-        this.cache = new index_1.CacheManager(obj.caches ?? [], obj.data, exports.events);
+        this.cache = new index_1.CacheManager(obj.caches ?? [], obj.data, this.eventEmitter);
     }
     connect() {
         this.discord_socket = new DiscordWebSocket({ version: this.version, encoding: this.encoding, data: this.data });
