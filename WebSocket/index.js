@@ -19,14 +19,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscordWebSocket = exports.DiscordEventEmitter = void 0;
 const ws_1 = require("ws");
-const node_events_1 = require("node:events");
 const GatewayTypes_1 = require("./GatewayTypes");
 const node_zlib_1 = __importDefault(require("node:zlib"));
 const index_1 = require("../index");
 const APITypes_1 = require("../REST/classes/APITypes");
-class DiscordEventEmitter extends node_events_1.EventEmitter {
+const eventemitter2_1 = __importDefault(require("eventemitter2"));
+class DiscordEventEmitter extends eventemitter2_1.default {
     constructor() {
-        super();
+        super({
+            wildcard: true,
+        });
     }
     on = this.on;
     once = this.once;
@@ -211,7 +213,9 @@ class DiscordWebSocket extends ws_1.WebSocket {
                     }, this.interval);
                     break;
             }
-            this.eventEmitter.emit(t, d);
+            if (t) {
+                this.eventEmitter.emit(t, d);
+            }
         };
         this.gunzip.on("data", func);
     }

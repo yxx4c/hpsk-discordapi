@@ -1,9 +1,9 @@
 import {WebSocket} from "ws"
-import {EventEmitter} from "node:events"
 import {Events, GatewayOpcodes, gatewayConnectCodes} from "./GatewayTypes"
 import zlib from "node:zlib"
 import { CacheManager, cacheTypes } from "../index"
 import { defaults } from "../REST/classes/APITypes"
+import EventEmitter from  'eventemitter2';
 
 export interface WebSocketOptions {
     version?: Number,
@@ -19,9 +19,11 @@ interface VoiceOptions {
     "selfDeaf": boolean,
     group: string
 }
-export class DiscordEventEmitter extends  EventEmitter {
+export class DiscordEventEmitter extends EventEmitter {
     constructor() {
-        super()
+        super({
+          wildcard: true,
+        })
     }
     on: (<K extends keyof Events>(event: K, listener: (...args: Events[K]) => void) => this) & (<S extends string | symbol>(event: Exclude<S, keyof Events>, listener: (...args: any[]) => void) => this) = this.on
     once: (<K extends keyof Events>(event: K, listener: (...args: Events[K]) => void) => this) & (<S extends string | symbol>(event: Exclude<S, keyof Events>, listener: (...args: any[]) => void) => this)  = this.once
@@ -204,7 +206,9 @@ export class DiscordWebSocket extends WebSocket {
       
             break;
         }
-        this.eventEmitter.emit(t, d)
+        if(t) {
+          this.eventEmitter.emit(t, d)
+        }
   }
     this.gunzip.on("data", func)
     }
