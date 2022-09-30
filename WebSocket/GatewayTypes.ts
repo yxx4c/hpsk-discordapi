@@ -1,4 +1,4 @@
-import { Shard, ShardError } from "../Sharding/Types"
+import { READY, Shard, ShardError } from "../Sharding/Types"
 
 
 export enum GatewayOpcodes {
@@ -54,7 +54,7 @@ export class GatewayConnection {
 }
 
 export interface Events {
-    "READY": any,
+    "READY": [payload: READY],
     "RESUME": any,
     "APPLICATION_COMMAND_PERMISSIONS_UPDATE": any,
     "AUTO_MODERATION_RULE_CREATE": any,
