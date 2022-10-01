@@ -17,7 +17,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DiscordWebSocket = exports.DiscordEventEmitter = void 0;
+exports.DiscordWebSocket = exports.events = exports.DiscordEventEmitter = void 0;
 const ws_1 = require("ws");
 const GatewayTypes_1 = require("./GatewayTypes");
 const node_zlib_1 = __importDefault(require("node:zlib"));
@@ -37,8 +37,9 @@ class DiscordEventEmitter extends eventemitter2_1.default {
     removeAllListeners = this.removeAllListeners;
 }
 exports.DiscordEventEmitter = DiscordEventEmitter;
+exports.events = new DiscordEventEmitter();
 class DiscordWebSocket extends ws_1.WebSocket {
-    eventEmitter = new DiscordEventEmitter();
+    eventEmitter = exports.events;
     resume_gateway_url;
     version;
     dataTwo;
